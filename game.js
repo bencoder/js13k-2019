@@ -10,7 +10,7 @@ setScreen();
 window.addEventListener('resize', setScreen);
 
 const ctx=c.getContext("2d");
-const level1 = {"walls":[[{"x":448,"y":960},{"x":448,"y":736},{"x":128,"y":736},{"x":128,"y":384},{"x":416,"y":384},{"x":416,"y":640},{"x":192,"y":640},{"x":192,"y":672},{"x":448,"y":672},{"x":448,"y":352},{"x":320,"y":352},{"x":320,"y":224},{"x":640,"y":224},{"x":640,"y":352},{"x":512,"y":352},{"x":512,"y":672},{"x":800,"y":672},{"x":800,"y":736},{"x":512,"y":736},{"x":512,"y":960}]],"doors":[{"name":"door2","polygon":[{"x":448,"y":352},{"x":512,"y":352},{"x":448,"y":352}],"open":false},{"name":"door1","polygon":[{"x":448,"y":672},{"x":448,"y":736},{"x":448,"y":672}],"open":false}],"switches":[{"x":352,"y":512,"target":"door2","type":"momentary"},{"x":769,"y":702,"target":"door1","type":"toggle"}],"start":{"x":480,"y":928},"end":{"x":480,"y":288}};
+const level1 = {"walls":[[{"x":448,"y":960},{"x":448,"y":736},{"x":128,"y":736},{"x":128,"y":384},{"x":416,"y":384},{"x":416,"y":640},{"x":192,"y":640},{"x":192,"y":672},{"x":448,"y":672},{"x":448,"y":352},{"x":320,"y":352},{"x":320,"y":224},{"x":640,"y":224},{"x":640,"y":352},{"x":512,"y":352},{"x":512,"y":672},{"x":800,"y":672},{"x":800,"y":736},{"x":512,"y":736},{"x":512,"y":960}]],"doors":[{"name":"door2","polygon":[{"x":448,"y":352},{"x":512,"y":352},{"x":448,"y":352}],"open":false},{"name":"door1","polygon":[{"x":448,"y":672},{"x":448,"y":736},{"x":448,"y":672}],"open":false}],"switches":[{"x":352,"y":512,"target":"door2","type":"momentary", "pressed":0},{"x":769,"y":702,"target":"door1","type":"toggle", "pressed":0}],"start":{"x":480,"y":928},"end":{"x":480,"y":288}};
 let camera = new Vec2(0,0);
 const worldToScreen = ({x,y}) => ({
     x: (x-camera.x)*scale+screenWidth/2,
@@ -76,11 +76,13 @@ function Vec2(x,y) {
 
 
 const fps = 20;
+const ghostTicks = 13 * fps; //13 seconds
 
 function Level(levelObject) {
-    const currentLevel = JSON.parse(JSON.stringify(levelObject));
+    let currentLevel = JSON.parse(JSON.stringify(levelObject));
     const switchRadius = 20;
-    doesCircleCollide = (position, radius) => {
+    
+    const doesCircleCollide = (position, radius) => {
         for (let i=0;i<currentLevel.walls.length;i++) {
             for (let j=1;j<currentLevel.walls[i].length;j++) {
                 if (doesLineInterceptCircle(currentLevel.walls[i][j-1],currentLevel.walls[i][j], position, radius))
@@ -96,28 +98,47 @@ function Level(levelObject) {
         return false;
     }
 
-    toggleDoor = doorName => {
+    const toggleDoor = doorName => {
         const door = currentLevel.doors.find(d => d.name == doorName);
         door.open = !door.open;
     }
 
-    handleSwitches = (oldPos, newPos, radius) => {
+    const handleSwitches = (oldPos, newPos, radius) => {
         for(let s of currentLevel.switches) {
             const switchPos = new Vec2(s.x, s.y);
             const wasTouching = oldPos.sub(switchPos).len() < (radius + switchRadius);
             const nowTouching = newPos.sub(switchPos).len() < (radius + switchRadius);
             if (!wasTouching && nowTouching) {
-                toggleDoor(s.target);
-                s.pressed = true;
+                if (s.pressed == 0) toggleDoor(s.target);   //only toggle if you're the first one on it
+                s.pressed++;
             }
-            if (!nowTouching) {
-                s.pressed = false;
+            if (wasTouching && !nowTouching) {
+                s.pressed--;
             }
-            if (wasTouching && !nowTouching && s.type == 'momentary') {
+            if (wasTouching && !nowTouching && s.type == 'momentary' && s.pressed == 0) {
                 toggleDoor(s.target);
             }
         }
     }
+
+    this.ghostRemoved = (position, radius) => {
+        for (let s of currentLevel.switches) {
+            const isTouching = position.sub(new Vec2(s.x,s.y)).len() < (radius + switchRadius);
+            if (isTouching) {
+                s.pressed--;
+                if (s.pressed == 0 && s.type == 'momentary') {
+                    toggleDoor(s.target);
+                }
+            }
+        }
+    }
+
+    this.getStart = () => levelObject.start;
+
+    this.reset = () => {
+        currentLevel = JSON.parse(JSON.stringify(levelObject));
+    }
+
     this.interact = (oldPos, radius, plannedVector) => {
         const newPos = oldPos.add(plannedVector);
 
@@ -157,6 +178,12 @@ function Player({x,y}, level) {
         drawCircle(this.position, radius, true);
     }
 
+    //similar to ghost movement, used for replaying up to currentTick
+    this.forceMove = vector => {
+        level.interact(this.position, radius, vector);
+        this.position = this.position.add(vector);
+    }
+
     this.move = (buttons) => {
         const movement = new Vec2(0,0);
 
@@ -173,16 +200,59 @@ function Player({x,y}, level) {
             movement.x += speed;
         }
 
-        this.position = this.position.add(
-            level.interact(this.position, radius, movement)
-        );
+        const actualVector = level.interact(this.position, radius, movement)
+        this.position = this.position.add(actualVector);
+
+        return actualVector;
+    }
+}
+
+
+function Ghost(endPosition, history, level) {
+    let position = new Vec2(endPosition.x, endPosition.y);
+    const radius = 10;
+    let i;
+    for(i=history.length-1; i >= history.length-ghostTicks && i >= 0; --i) {
+        position = position.sub(history[i]);
+    }
+    const startPosition = new Vec2(position.x, position.y);
+    const startTick = i;
+    const myHistory = history.slice(startTick);
+
+    this.tick = currentTick => {
+        if (currentTick < startTick) return;
+        if (currentTick-startTick == myHistory.length) {
+            level.ghostRemoved(position, radius);
+            return;
+        }
+        if (currentTick-startTick > myHistory.length) return;
+        const movementVector = myHistory[currentTick - startTick];
+        level.interact(position, radius, movementVector);
+        position = position.add(movementVector); //always apply the vector, cause we're a ghost
+    }
+
+    this.reset = (currentTick) => {
+        position = new Vec2(startPosition.x, startPosition.y);
+        let tick = startTick;
+        for (let tick=startTick; tick<currentTick;tick++) {
+            this.tick(tick);
+        }
+    }
+
+    this.draw = currentTick => {
+        if (currentTick < startTick) return;
+        if (currentTick > (startTick + myHistory.length)) return;
+        setColor('orange');
+        drawCircle(position, radius, true);
     }
 }
 
 const Game = function(levelObject) {
     let level;
     let player;
+    let ghosts = [];
     let currentTick = 0;
+    let history = [];
 
     const buttons = {
         up:false,
@@ -195,11 +265,35 @@ const Game = function(levelObject) {
         camera = player.position;
         clearScreen();
         level.draw();
+        for(g of ghosts) {
+            g.draw(currentTick);
+        }
         player.draw();
     }
 
     const updateGame = () => {
-        player.move(buttons);
+        history[currentTick] = player.move(buttons);
+        for(g of ghosts) {
+            g.tick(currentTick);
+        }
+    }
+
+    goBack = () => {
+        ghosts.push(new Ghost(player.position,history,level));
+        currentTick -= ghostTicks;  //go back in time
+        if (currentTick < 0) currentTick = 0;
+
+        level.reset(); //reset level and player
+        player = new Player(level.getStart(), level);
+        for (g of ghosts) g.reset(currentTick);
+        history = history.slice(0,currentTick);
+        //play everything forward
+        for(let i=0;i<currentTick;i++) {
+            player.forceMove(history[i]);
+            for (g of ghosts) {
+                g.tick(i);
+            }
+        }
     }
 
     this.tick = () => {
@@ -208,7 +302,14 @@ const Game = function(levelObject) {
         ++currentTick;
     }
 
-    this.buttonDown = key => buttons[key] = true;
+    this.buttonDown = key => {
+        if (key in buttons) {
+            buttons[key] = true;
+        }
+        if (key == 'back') {
+            goBack();
+        }
+    }
     this.buttonUp = key => buttons[key] = false;
 
     this.loadLevel = (levelObject) => {
@@ -246,15 +347,20 @@ const keyMap = {
     'ArrowLeft': 'left',
     'KeyA': 'left',
     'ArrowRight': 'right',
-    'KeyD': 'right'
+    'KeyD': 'right',
+    'Backspace': 'back'
 }
 window.addEventListener('keydown', ev => {
     if (keyMap[ev.code]) {
-        game.buttonDown(keyMap[ev.code])
+        game.buttonDown(keyMap[ev.code]),
+        ev.preventDefault();
+        return false;
     }
 });
 window.addEventListener('keyup', ev => {
     if (keyMap[ev.code]) {
         game.buttonUp(keyMap[ev.code])
+        ev.preventDefault();
+        return false;
     }
 });

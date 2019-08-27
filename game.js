@@ -75,7 +75,7 @@ function Vec2(x,y) {
 }
 
 
-const fps = 20;
+const fps = 60;
 const ghostTicks = 13 * fps; //13 seconds
 
 function Level(levelObject) {
@@ -332,7 +332,7 @@ const update = time => {
     const dt = (time - previous) / 1000.0;
     accumulator += dt;
     if (accumulator > 1.0/fps) {
-        accumulator - 1.0/fps;
+        accumulator -= 1.0/fps;
         game.tick();
     }
     previous = time;

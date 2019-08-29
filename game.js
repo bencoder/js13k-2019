@@ -72,11 +72,18 @@ function Vec2(x,y) {
     this.add = v => new Vec2(this.x+v.x, this.y+v.y);
     this.sub = v => new Vec2(this.x-v.x, this.y-v.y);
     this.len = () => Math.sqrt(this.x*this.x+this.y*this.y);
+    this.mul = n =>new Vec2(this.x*n, this.y*n);
+    this.copy = () => new Vec2(this.x,this.y);
 }
 
 
-const fps = 60;
-const ghostTicks = 13 * fps; //13 seconds
+const tps = 20; // number of ticks per second (FPS is greater and is done by interpolating from the previous movement to the next)
+const ghostTicks = 5 * tps; //13 seconds
+let accumulator = 0; //stores incrementing value (in seconds) until the next frame, when it's then decremented by 1 frame's length
+
+function interpolate(position, movementVector) {
+    return position.sub(movementVector).add(movementVector.mul(tps*accumulator));
+}
 
 function Level(levelObject) {
     let currentLevel = JSON.parse(JSON.stringify(levelObject));
@@ -169,13 +176,14 @@ function Level(levelObject) {
 }
 
 function Player({x,y}, level) {
-    const speed = 100 / fps;
+    const speed = 100 / tps;
     const radius = 10;
     this.position = new Vec2(x,y);
+    this.movementVector = new Vec2(0,0); //stores last movement vector
 
     this.draw = () => {
         setColor('green');
-        drawCircle(this.position, radius, true);
+        drawCircle(interpolate(this.position, this.movementVector), radius, true);
     }
 
     //similar to ghost movement, used for replaying up to currentTick
@@ -187,54 +195,46 @@ function Player({x,y}, level) {
     this.move = (buttons) => {
         const movement = new Vec2(0,0);
 
-        if (buttons.up) {
-            movement.y -= speed;
-        }
-        if (buttons.down) {
-            movement.y += speed;
-        }
-        if (buttons.left) {
-            movement.x -= speed;
-        }
-        if (buttons.right) {
-            movement.x += speed;
-        }
+        if (buttons.up) movement.y -= speed;
+        if (buttons.down)  movement.y += speed;
+        if (buttons.left) movement.x -= speed;
+        if (buttons.right) movement.x += speed;
 
-        const actualVector = level.interact(this.position, radius, movement)
-        this.position = this.position.add(actualVector);
+        this.movementVector = level.interact(this.position, radius, movement)
+        this.position = this.position.add(this.movementVector);
 
-        return actualVector;
+        return this.movementVector;
     }
 }
 
 
 function Ghost(endPosition, history, level) {
-    let position = new Vec2(endPosition.x, endPosition.y);
+    let position = endPosition.copy();
     const radius = 10;
     let i;
     for(i=history.length-1; i >= history.length-ghostTicks && i >= 0; --i) {
         position = position.sub(history[i]);
     }
-    const startPosition = new Vec2(position.x, position.y);
-    const startTick = i;
+    const startPosition = position.copy();
+    const startTick = i+1;
     const myHistory = history.slice(startTick);
+    let movementVector = new Vec2(0,0); //stores the last movementVector
 
     this.tick = currentTick => {
         if (currentTick < startTick) return;
+        if (currentTick-startTick > myHistory.length) return;
         if (currentTick-startTick == myHistory.length) {
             level.ghostRemoved(position, radius);
             return;
         }
-        if (currentTick-startTick > myHistory.length) return;
-        const movementVector = myHistory[currentTick - startTick];
+        movementVector = myHistory[currentTick - startTick];
         level.interact(position, radius, movementVector);
         position = position.add(movementVector); //always apply the vector, cause we're a ghost
     }
 
     this.reset = (currentTick) => {
-        position = new Vec2(startPosition.x, startPosition.y);
-        let tick = startTick;
-        for (let tick=startTick; tick<currentTick;tick++) {
+        position = startPosition.copy();
+        for (let tick=startTick; tick<=currentTick;tick++) {
             this.tick(tick);
         }
     }
@@ -243,7 +243,7 @@ function Ghost(endPosition, history, level) {
         if (currentTick < startTick) return;
         if (currentTick > (startTick + myHistory.length)) return;
         setColor('orange');
-        drawCircle(position, radius, true);
+        drawCircle(interpolate(position, movementVector), radius, true);
     }
 }
 
@@ -261,8 +261,8 @@ const Game = function(levelObject) {
         right:false
     }
 
-    const draw = () => {
-        camera = player.position;
+    this.draw = () => {
+        camera = interpolate(player.position, player.movementVector);
         clearScreen();
         level.draw();
         for(g of ghosts) {
@@ -279,13 +279,16 @@ const Game = function(levelObject) {
     }
 
     goBack = () => {
+
+        for (g of ghosts) g.reset(currentTick);
         ghosts.push(new Ghost(player.position,history,level));
         currentTick -= ghostTicks;  //go back in time
         if (currentTick < 0) currentTick = 0;
 
-        level.reset(); //reset level and player
+         //reset level and player
+        level.reset();
         player = new Player(level.getStart(), level);
-        for (g of ghosts) g.reset(currentTick);
+        
         history = history.slice(0,currentTick);
         //play everything forward
         for(let i=0;i<currentTick;i++) {
@@ -297,7 +300,6 @@ const Game = function(levelObject) {
     }
 
     this.tick = () => {
-        draw();
         updateGame();
         ++currentTick;
     }
@@ -325,16 +327,18 @@ const Game = function(levelObject) {
 const game = new Game(level1);
 
 let previous;
-let accumulator = 0; //stores incrementing value (in seconds) until the next frame, when it's then decremented by 1 frame's length
 const update = time => {
     window.requestAnimationFrame(update);
     if (previous === undefined) { previous = time; }
     const dt = (time - previous) / 1000.0;
     accumulator += dt;
-    if (accumulator > 1.0/fps) {
-        accumulator -= 1.0/fps;
+
+    if (accumulator > 1.0/tps) {
+        accumulator -= 1.0/tps;
         game.tick();
     }
+
+    game.draw();
     previous = time;
 }
 window.requestAnimationFrame(update);

@@ -232,19 +232,24 @@ function Ghost(history, level) {
         setColor('orange');
         drawCircle(interpolate(position, movementVector), radius, true);
     }
+
+    this.reset = () => {
+        position = level.getStart();
+    }
 }
 
 const Game = function(levelObject) {
     let level;
     let player;
-    let ghost = null;
+    let ghosts = [];
     let currentTick = 0;
     let history = [];
 
     const buttons = {}
 
     const die = () => {
-        ghost = new Ghost(history, level);
+        for(g of ghosts) g.reset();
+        ghosts.push(new Ghost(history, level));
         currentTick = 0;
         history = [];
 
@@ -257,7 +262,7 @@ const Game = function(levelObject) {
         camera = interpolate(player.position, player.movementVector);
         clearScreen();
         level.draw();
-        if (ghost) ghost.draw(currentTick);
+        for(g of ghosts) g.draw(currentTick);
         player.draw();
         drawTimer(currentTick / tps);
     }
@@ -268,7 +273,7 @@ const Game = function(levelObject) {
             return;
         }
         history[currentTick] = player.move(buttons);
-        if (ghost)  ghost.tick(currentTick);
+        for(g of ghosts) g.tick(currentTick);
         ++currentTick;
     }
 

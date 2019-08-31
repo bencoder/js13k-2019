@@ -1,7 +1,7 @@
 const Drawing = function(c) {
     let screenWidth;
     let screenHeight;
-    let scale = 1.5;
+    let scale = 1;
     const setScreen = () => {
         screenWidth=c.width=c.clientWidth;
         screenHeight=c.height=c.clientHeight;
@@ -10,6 +10,10 @@ const Drawing = function(c) {
     window.addEventListener('resize', setScreen);
 
     const ctx=c.getContext("2d");
+
+    const patterns = {
+        grass: ctx.createPattern(grass,'repeat')
+    }
     
     camera = {x:0,y:0};
     this.accumulator = 0;
@@ -44,13 +48,48 @@ const Drawing = function(c) {
         if (fill) ctx.fill();
     }
 
+    const image = (pos, image) => {
+        const p = worldToScreen(pos);
+        if (p.x+image.width < 0 || p.y+image.height < 0 || p.x > screenWidth || p.y > screenHeight) return;
+        ctx.drawImage(image, p.x, p.y, image.width*scale, image.height*scale);
+    }
+
+    const imageLine = (p1, p2, tex) => {
+        const size = tex.width*scale;
+        const v = {
+            x: p2.x-p1.x,
+            y: p2.y-p1.y
+        }
+        const length = Math.sqrt(v.x*v.x + v.y*v.y);
+        const s = {
+            x:v.x/length * size,
+            y:v.y/length * size
+        }
+        for (let i=0; i<=(length/size); i++) {
+            const p = {
+                x: p1.x + s.x*i - size/2,
+                y: p1.y + s.y*i - size/2
+            }
+            image(p, tex);
+        }
+    }
+
+    const imagePoly = (polygon, tex) => {
+        for(let i=0; i < polygon.length-1; i++) {
+            imageLine(polygon[i], polygon[i+1], tex);
+        }
+    }
+
     this.setCamera = (position, movementVector) => {
         camera = interpolate(position, movementVector);
     }
 
     this.bg = () => {
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0,0,screenWidth,screenHeight);
+        for(let y=-1000;y<3000;y+=grass.height) {
+            for(let x=-1000;x<3000;x+=grass.width) {
+                image({x,y},grass);
+            }
+        }
     }
 
     this.timer = (time) => {
@@ -74,9 +113,9 @@ const Drawing = function(c) {
     }
 
     this.level = (level) => {
-        color('white');
-        level.walls.forEach(poly);
 
+        level.walls.forEach(w => imagePoly(w, brick));
+        
         color('purple');
         level.doors.filter(door => !door.open).forEach(door => poly(door.polygon));
 

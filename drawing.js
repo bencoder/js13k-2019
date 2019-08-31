@@ -31,7 +31,7 @@ const Drawing = function(c) {
         ctx.fillStyle = color;
         ctx.strokeStyle = color;
     }
-    const poly = polygon => {
+    const poly = (polygon) => {
         const screenPoly = polygon.map(worldToScreen);
         ctx.beginPath();
         ctx.moveTo(screenPoly[0].x, screenPoly[0].y);
@@ -74,10 +74,39 @@ const Drawing = function(c) {
         }
     }
 
-    const imagePoly = (polygon, tex) => {
+    const imagePolyLine = (polygon, tex) => {
         for(let i=0; i < polygon.length-1; i++) {
             imageLine(polygon[i], polygon[i+1], tex);
         }
+    }
+
+    let fpCache = {}
+    const filledImagePoly = (polygon, tex) => {
+        const key = JSON.stringify(polygon);
+        if (fpCache[key]) {
+            image(fpCache[key].pos, fpCache[key].image);
+        }
+        let min = {x:10000,y:10000}
+        let max = {x:0, y:0}
+        for (let p of polygon) {
+            min.x = min.x < p.x ? min.x : p.x;
+            min.y = min.y < p.y ? min.y : p.y;
+            max.x = max.x > p.x ? max.x : p.x;
+            max.y = max.y > p.y ? max.y : p.y;
+        }
+
+        const canvas = new OffscreenCanvas(max.x-min.x, max.y-min.y);
+        const ct = canvas.getContext('2d');
+        ct.fillStyle = ctx.createPattern(tex, 'repeat');
+        const p = polygon.map(p=>({x:p.x-min.x,y:p.y-min.y}));
+        ct.beginPath();
+        ct.moveTo(p[0].x, p[0].y);
+        for(let i=1;i<p.length;i++)
+            ct.lineTo(p[i].x,p[i].y);
+        ct.closePath();
+        ct.fill()
+        fpCache[key] = {pos: min, image: canvas}
+        image(min, canvas);
     }
 
     this.setCamera = (position, movementVector) => {
@@ -113,9 +142,9 @@ const Drawing = function(c) {
     }
 
     this.level = (level) => {
-
-        level.walls.forEach(w => imagePoly(w, brick));
-
+        level.walls.forEach(w => filledImagePoly(w, cobbles));
+        level.walls.forEach(w => imagePolyLine(w, brick));
+    
         color('purple');
         level.doors.filter(door => !door.open).forEach(door => poly(door.polygon));
 

@@ -1,7 +1,7 @@
 const Drawing = function(c) {
     let screenWidth;
     let screenHeight;
-    let scale = 1;
+    let scale = 1.5;
     const setScreen = () => {
         screenWidth=c.width=c.clientWidth;
         screenHeight=c.height=c.clientHeight;
@@ -50,12 +50,12 @@ const Drawing = function(c) {
 
     const image = (pos, image) => {
         const p = worldToScreen(pos);
-        if (p.x+image.width < 0 || p.y+image.height < 0 || p.x > screenWidth || p.y > screenHeight) return;
+        if (p.x < -image.width*2 || p.y < -image.height*2 || p.x > screenWidth || p.y > screenHeight) return;
         ctx.drawImage(image, p.x, p.y, image.width*scale, image.height*scale);
     }
 
     const imageLine = (p1, p2, tex) => {
-        const size = tex.width*scale;
+        const size = tex.width; //needs to be a square
         const v = {
             x: p2.x-p1.x,
             y: p2.y-p1.y
@@ -115,7 +115,7 @@ const Drawing = function(c) {
     this.level = (level) => {
 
         level.walls.forEach(w => imagePoly(w, brick));
-        
+
         color('purple');
         level.doors.filter(door => !door.open).forEach(door => poly(door.polygon));
 

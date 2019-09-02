@@ -1,0 +1,34 @@
+# shall we prettify src?
+src
+
+# output dirs
+build
+
+# Dependencies and vendor
+vendor
+typings
+node_modules
+bower_components
+jspm_packages
+package-lock.json
+
+# Build outputs
+bundle.js
+*.bundle.js
+.serverless
+build/Release
+*.min.js
+*.min.json
+
+# Cache
+.cache
+.fuse_hidden*
+.temp
+.fusebox
+.dynamodb
+
+# Test coverage and snapshots
+lib-cov
+coverage
+.nyc_output
+__snapshots__

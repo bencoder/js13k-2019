@@ -1,0 +1,12 @@
+{
+	"editor.tabSize": 4,
+	"editor.detectIndentation": false,
+	"editor.formatOnSave": true,
+	"eslint.autoFixOnSave": true,
+	"eslint.validate": [
+		{ "language": "javascript", "autoFix": true },
+		{ "language": "javascriptreact", "autoFix": true },
+		{ "language": "typescript", "autoFix": true },
+		{ "language": "typescriptreact", "autoFix": true }
+	]
+}

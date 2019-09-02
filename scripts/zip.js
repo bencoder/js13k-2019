@@ -63,7 +63,7 @@ async function build() {
 
 	scriptTags.remove();
 
-	const outHtmlText = minifyHtml ? minifyHtml($.html()) : $.html();
+	const outHtmlText = options.minifyHtml ? minifyHtml($.html()) : $.html();
 
 	fs.writeFileSync(outIndexHtmlPath, outHtmlText);
 

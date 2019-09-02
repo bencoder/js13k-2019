@@ -1,0 +1,35 @@
+{
+	"name": "js13k-2019",
+	"version": "1.0.0",
+	"description": "ghosts",
+	"main": "index.js",
+	"scripts": {
+		"zip": "node ./scripts/zip.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bencoder/js13k-2019.git"
+	},
+	"keywords": [
+		"ghost",
+		"js13k"
+	],
+	"author": "Ben Clarks, Salvatore Previti",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/bencoder/js13k-2019/issues"
+	},
+	"homepage": "https://github.com/bencoder/js13k-2019#readme",
+	"devDependencies": {
+		"archiver": "^3.1.1",
+		"eslint": "^6.3.0",
+		"eslint-config-prettier": "^6.1.0",
+		"html-minifier": "^4.0.0",
+		"mkdirp": "^0.5.1",
+		"prettier": "^1.18.2",
+		"prettysize": "^2.0.0",
+		"uglify-es": "^3.3.9",
+		"uglify-js": "^3.6.0"
+	}
+}

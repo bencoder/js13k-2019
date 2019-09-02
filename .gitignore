@@ -1,0 +1,84 @@
+# out folder
+out
+
+# excluded files for security
+.npmrc
+.env
+.env.test
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Dependency directories
+typings
+bower_components
+node_modules
+bower_components
+jspm_packages
+
+# Build outputs
+.serverless
+build/Release
+build/Debug
+*.tgz
+*.tmp-browserify-*
+ipch
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Cache and lockfiles
+.cache
+.fuse_hidden*
+.fusebox
+.dynamodb
+*.tsbuildinfo
+.cache
+.npm
+.eslintcache
+.node_repl_history
+.yarn-integrity
+.grunt
+.lock-wscript
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Test coverage
+lib-cov
+coverage
+.nyc_output
+*.lcov
+
+# IDEs and OS
+.idea
+.DS_Store
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.Trash-*
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDouble
+.LSOverride
+.apdisk
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk

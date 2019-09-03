@@ -53,7 +53,7 @@ const Drawing = function(c) {
 
   const image = (pos, img) => {
     const p = worldToScreen(pos)
-    if (p.x < -img.width * 2 || p.y < -img.height * 2 || p.x > screenWidth || p.y > screenHeight) {
+    if (p.x < -img.width * scale || p.y < -img.height * scale || p.x > screenWidth || p.y > screenHeight) {
       return
     }
     ctx.drawImage(img, p.x, p.y, img.width * scale, img.height * scale)

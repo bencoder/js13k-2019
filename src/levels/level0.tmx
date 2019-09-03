@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="6">
- <objectgroup id="2" name="walls">
-  <object id="1" name="walls" x="416" y="768">
+ <objectgroup id="3" name="features">
+  <object id="1" name="walls" type="wall" x="416" y="768">
    <polygon points="0,0 0,-480 -96,-480 -96,-608 160,-608 160,-480 64,-480 64,0"/>
   </object>
- </objectgroup>
- <objectgroup id="3" name="features">
   <object id="2" name="start" type="start" x="448" y="736">
    <point/>
   </object>

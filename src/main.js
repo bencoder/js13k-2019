@@ -13,7 +13,7 @@ const level0 = {
     ]
   ],
   doors: [{ name: 'door1', polygon: [{ x: 416, y: 288 }, { x: 480, y: 288 }, { x: 416, y: 288 }], open: false }],
-  switches: [{ x: 448, y: 480, target: 'door1', type: 'momentary', pressed: 0 }],
+  switches: [{ x: 448, y: 480, targets: ['door1'], type: 'momentary', pressed: 0 }],
   start: { x: 448, y: 736 },
   end: { x: 448, y: 224 }
 }
@@ -48,8 +48,8 @@ const level1 = {
     { name: 'door1', polygon: [{ x: 448, y: 672 }, { x: 448, y: 736 }, { x: 448, y: 672 }], open: false }
   ],
   switches: [
-    { x: 352, y: 512, target: 'door2', type: 'momentary', pressed: 0 },
-    { x: 769, y: 702, target: 'door1', type: 'toggle', pressed: 0 }
+    { x: 352, y: 512, targets: ['door2'], type: 'momentary', pressed: 0 },
+    { x: 769, y: 702, targets: ['door1'], type: 'toggle', pressed: 0 }
   ],
   start: { x: 480, y: 928 },
   end: { x: 480, y: 288 }

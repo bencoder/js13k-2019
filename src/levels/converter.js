@@ -7,14 +7,11 @@ const result = {
   doors: [],
   switches: []
 }
-const currentType = data.layers.forEach(layer => {
-  if (layer.name === 'walls') {
-    layer.objects.forEach(object => {
-      result.walls.push(object.polygon.map(({ x, y }) => ({ x: x + object.x, y: y + object.y })))
-    })
-    return
-  }
+data.layers.forEach(layer => {
   layer.objects.forEach(object => {
+    if (object.type === 'wall') {
+      result.walls.push(object.polygon.map(({ x, y }) => ({ x: x + object.x, y: y + object.y })))
+    }
     if (object.type === 'door') {
       result.doors.push({
         name: object.name,
@@ -32,8 +29,9 @@ const currentType = data.layers.forEach(layer => {
       result.switches.push({
         x: object.x,
         y: object.y,
-        target: object.properties.find(p => p.name === 'target').value,
-        type: object.properties.find(p => p.name === 'type').value
+        targets: object.properties.find(p => p.name === 'target').value.split(','),
+        type: object.properties.find(p => p.name === 'type').value,
+        pressed: 0
       })
     }
   })

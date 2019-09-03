@@ -39,7 +39,9 @@ function Level(levelObject) {
       const nowTouching = newPos.sub(switchPos).len() < radius + Settings.switchRadius
       if (!wasTouching && nowTouching) {
         if (s.pressed === 0) {
-          toggleDoor(s.target)
+          for (let target of s.targets) {
+            toggleDoor(target)
+          }
         } //only toggle if you're the first one on it
         s.pressed++
       }
@@ -47,7 +49,9 @@ function Level(levelObject) {
         s.pressed--
       }
       if (wasTouching && !nowTouching && s.type === 'momentary' && s.pressed === 0) {
-        toggleDoor(s.target)
+        for (let target of s.targets) {
+          toggleDoor(target)
+        }
       }
     }
   }

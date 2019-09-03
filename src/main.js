@@ -17,7 +17,59 @@ const level0 = {
   start: { x: 448, y: 736 },
   end: { x: 448, y: 224 }
 }
+
 const level1 = {
+  walls: [
+    [
+      { x: 288, y: 960 },
+      { x: 288, y: 800 },
+      { x: 416, y: 800 },
+      { x: 416, y: 832 },
+      { x: 448, y: 832 },
+      { x: 448, y: 768 },
+      { x: 320, y: 768 },
+      { x: 320, y: 576 },
+      { x: 448, y: 576 },
+      { x: 448, y: 352 },
+      { x: 416, y: 352 },
+      { x: 416, y: 224 },
+      { x: 544, y: 224 },
+      { x: 544, y: 352 },
+      { x: 512, y: 352 },
+      { x: 512, y: 352 },
+      { x: 512, y: 480 },
+      { x: 736, y: 480 },
+      { x: 736, y: 608 },
+      { x: 832, y: 608 },
+      { x: 832, y: 736 },
+      { x: 576, y: 736 },
+      { x: 576, y: 608 },
+      { x: 672, y: 608 },
+      { x: 672, y: 544 },
+      { x: 512, y: 544 },
+      { x: 512, y: 640 },
+      { x: 384, y: 640 },
+      { x: 384, y: 704 },
+      { x: 512, y: 704 },
+      { x: 512, y: 896 },
+      { x: 416, y: 896 },
+      { x: 416, y: 960 },
+      { x: 288, y: 960 }
+    ]
+  ],
+  doors: [
+    { name: 'door2', polygon: [{ x: 448, y: 352 }, { x: 512, y: 352 }, { x: 448, y: 352 }], open: false },
+    { name: 'door1', polygon: [{ x: 448, y: 416 }, { x: 448, y: 416 }, { x: 512, y: 416 }], open: false }
+  ],
+  switches: [
+    { x: 768, y: 672, targets: ['door1'], type: 'momentary', pressed: 0 },
+    { x: 640, y: 672, targets: ['door2'], type: 'momentary', pressed: 0 }
+  ],
+  start: { x: 352, y: 896 },
+  end: { x: 480, y: 288 }
+}
+
+const level2 = {
   walls: [
     [
       { x: 448, y: 960 },
@@ -64,10 +116,10 @@ const Settings = {
 }
 
 const Draw = new Drawing(document.getElementById('c'))
-const levels = [level0, level1]
+const levels = [level0, level1, level2]
 const game = new Game(levels)
 
-let levelIndex = 0
+const levelIndex = 0
 game.loadLevel(levelIndex)
 
 let previous

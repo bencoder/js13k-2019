@@ -8,7 +8,8 @@ const level0 = {
       { x: 576, y: 160 },
       { x: 576, y: 288 },
       { x: 480, y: 288 },
-      { x: 480, y: 768 }
+      { x: 480, y: 768 },
+      { x: 416, y: 768 }
     ]
   ],
   doors: [{ name: 'door1', polygon: [{ x: 416, y: 288 }, { x: 480, y: 288 }, { x: 416, y: 288 }], open: false }],
@@ -63,7 +64,11 @@ const Settings = {
 }
 
 const Draw = new Drawing(document.getElementById('c'))
-const game = new Game(level0)
+const levels = [level0, level1]
+const game = new Game(levels)
+
+let levelIndex = 0
+game.loadLevel(levelIndex)
 
 let previous
 let accumulator = 0 //stores incrementing value (in seconds) until the next tick, when it's then decremented by 1 tick's length
@@ -79,7 +84,9 @@ const update = time => {
     accumulator -= 1.0 / Settings.tps
     game.tick()
   }
+
   game.draw(accumulator)
+
   previous = time
 }
 window.requestAnimationFrame(update)

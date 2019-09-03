@@ -163,5 +163,8 @@ const Drawing = function(c) {
         circle(s, Settings.switchRadius - 2)
       }
     })
+
+    color('red')
+    circle(level.end, Settings.switchRadius, true)
   }
 }

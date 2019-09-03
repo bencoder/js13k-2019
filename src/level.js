@@ -1,6 +1,5 @@
 function Level(levelObject) {
   let currentLevel = JSON.parse(JSON.stringify(levelObject))
-  const switchRadius = 20
 
   const doesCircleCollide = (position, radius) => {
     for (let i = 0; i < currentLevel.walls.length; i++) {
@@ -36,8 +35,8 @@ function Level(levelObject) {
   const handleSwitches = (oldPos, newPos, radius) => {
     for (const s of currentLevel.switches) {
       const switchPos = new Vec2(s.x, s.y)
-      const wasTouching = oldPos.sub(switchPos).len() < radius + switchRadius
-      const nowTouching = newPos.sub(switchPos).len() < radius + switchRadius
+      const wasTouching = oldPos.sub(switchPos).len() < radius + Settings.switchRadius
+      const nowTouching = newPos.sub(switchPos).len() < radius + Settings.switchRadius
       if (!wasTouching && nowTouching) {
         if (s.pressed === 0) {
           toggleDoor(s.target)
@@ -53,9 +52,16 @@ function Level(levelObject) {
     }
   }
 
+  const handleEnd = (position, radius) => {
+    const isEnded = position.sub(new Vec2(levelObject.end.x, levelObject.end.y)).len() < radius + Settings.switchRadius
+    if (isEnded) {
+      this.completed = true
+    }
+  }
+
   this.ghostRemoved = (position, radius) => {
     for (const s of currentLevel.switches) {
-      const isTouching = position.sub(new Vec2(s.x, s.y)).len() < radius + switchRadius
+      const isTouching = position.sub(new Vec2(s.x, s.y)).len() < radius + Settings.switchRadius
       if (isTouching) {
         s.pressed--
         if (s.pressed === 0 && s.type === 'momentary') {
@@ -79,6 +85,8 @@ function Level(levelObject) {
     }
 
     handleSwitches(oldPos, newPos, radius)
+
+    handleEnd(newPos, radius)
 
     return plannedVector
   }

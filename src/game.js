@@ -1,9 +1,10 @@
-function Game(levelObject) {
+function Game(levels) {
   let level
   let player
-  const ghosts = []
+  let ghosts = []
   let currentTick = 0
   let history = []
+  let currentLevel = 0
 
   const buttons = {}
 
@@ -33,6 +34,10 @@ function Game(levelObject) {
   }
 
   this.tick = () => {
+    if (level.completed) {
+      this.loadLevel(currentLevel + 1)
+      return
+    }
     if (currentTick === Settings.timeToDie * Settings.tps) {
       die()
       return
@@ -53,12 +58,14 @@ function Game(levelObject) {
 
   this.buttonUp = key => (buttons[key] = false)
 
-  this.loadLevel = lvl => {
-    level = new Level(lvl)
+  this.loadLevel = index => {
+    currentLevel = index
+    level = new Level(levels[index])
+    history = []
     player = new Player(level)
+    ghosts = []
+    currentTick = 0
   }
 
-  if (levelObject) {
-    this.loadLevel(levelObject)
-  }
+  this.loadLevel(currentLevel)
 }

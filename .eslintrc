@@ -245,7 +245,7 @@
     "yoda": 2
   },
   "parserOptions": {
-    "ecmaVersion": 8
+    "ecmaVersion": 9
   },
   "env": {
     "es6": true,

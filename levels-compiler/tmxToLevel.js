@@ -19,7 +19,6 @@ function tmxToLevel(xmlText, id) {
 
     door(object, properties) {
       level.doors.push({
-        ...properties,
         name: object.name,
         polygon: tmxPolygonPoints(object.polygon.points, object.x, object.y),
         open: !!properties.open
@@ -28,7 +27,6 @@ function tmxToLevel(xmlText, id) {
 
     switch(object, properties) {
       level.switches.push({
-        ...properties,
         x: object.x,
         y: object.y,
         name: object.name,

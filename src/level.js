@@ -69,7 +69,9 @@ function Level(levelObject) {
       if (isTouching) {
         s.pressed--
         if (s.pressed === 0 && s.type === 'momentary') {
-          toggleDoor(s.target)
+          for (const target of s.targets) {
+            toggleDoor(target)
+          }
         }
       }
     }

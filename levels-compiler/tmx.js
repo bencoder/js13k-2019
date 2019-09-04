@@ -47,7 +47,7 @@ function tmxPolygonPoints(text, objectX = 0, objectY = 0) {
   const first = array[0]
   const last = array[array.length - 1]
   if (first && first !== last && (first.x !== last.x || first.y !== last.y)) {
-    array.push(first)
+    array.push({ ...first })
   }
 
   return array

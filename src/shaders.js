@@ -17,7 +17,8 @@ void main(void) {
 const shader_basic_frag = `
 precision mediump float;
 varying vec3 vPosition;
+varying vec3 vColor;
 void main(void) {
-  gl_FragColor = vec4(vPosition, 1.);
+  gl_FragColor = vec4(vColor, 1.);
 }
 `

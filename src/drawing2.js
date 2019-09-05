@@ -10,7 +10,7 @@ const Drawing = function(canvas) {
     const indices = []
 
     const vertexMap = new Map()
-    function getVertex(x, y, z, type = 0) {
+    const getVertex = (x, y, z, type = 0) => {
       const key = JSON.stringify([x, y, z, type])
       let result = vertexMap.get(key)
       if (result === undefined) {
@@ -26,7 +26,26 @@ const Drawing = function(canvas) {
       return result
     }
 
-    for (const pts of levels[0].polys) {
+    const makeWallQuad = (x1, y1, z1, x2, y2, z2) => {
+      const p0 = getVertex(x1, y1, z1, 1)
+      const p1 = getVertex(x2, y1, z2, 1)
+      const p2 = getVertex(x1, y2, z1, 1)
+      const p3 = getVertex(x2, y2, z2, 1)
+      indices.push(p0, p3, p1, p0, p2, p3)
+    }
+
+    const level = levels[0]
+
+    const walls = level.walls
+    for (const poly of walls) {
+      for (let i = 0; i < poly.length; ++i) {
+        const a = poly[i]
+        const b = poly[(i + 1) % poly.length]
+        makeWallQuad(a.x, 1, a.y, b.x, 100, b.y)
+      }
+    }
+
+    for (const pts of level.polys) {
       const p0 = pts[0]
       let pHelper = pts[1]
       for (let i = 2; i < pts.length; ++i) {

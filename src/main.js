@@ -3,8 +3,7 @@ const Settings = {
   timeToDie: 13,
   playerRadius: 10,
   switchRadius: 20,
-  playerSpeed: 5,
-  deadTicksPerTick: 13
+  playerSpeed: 5
 }
 
 const Draw = new Drawing(document.getElementById('c'))

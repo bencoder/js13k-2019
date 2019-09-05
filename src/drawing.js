@@ -171,7 +171,7 @@ const Drawing = function(c) {
     ctx.textBaseline = 'middle'
     ctx.fillText('13 seconds to die', screenWidth / 2, screenHeight / 2)
     ctx.textAlign = 'left'
-    ctx.textBaseline = 'top'
+    ctx.textBaseline = 'alphabetic'
   }
   this.endScreen = () => {
     ctx.fillStyle = '#F00'
@@ -180,6 +180,6 @@ const Drawing = function(c) {
     ctx.textBaseline = 'middle'
     ctx.fillText('You win!', screenWidth / 2, screenHeight / 2)
     ctx.textAlign = 'left'
-    ctx.textBaseline = 'top'
+    ctx.textBaseline = 'alphabetic'
   }
 }

@@ -59,11 +59,11 @@ function Game(levels) {
   this.tick = () => {
     if (state === STATE_DEAD) {
       let mv = new Vec2(0, 0)
-      for (let i = 0; i < Settings.deadTicksPerTick && currentTick > 0; i++) {
+      while (mv.len() < 40 && currentTick > 0) {
         --currentTick
         mv = mv.sub(history[currentTick])
       }
-      Draw.scale *= 0.95
+      Draw.scale /= 0.95
       player.forceMove(mv)
       if (currentTick == 0) {
         reset()

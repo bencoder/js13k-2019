@@ -3,22 +3,23 @@ attribute vec3 position;
 uniform mat4 Pmatrix;
 uniform mat4 Vmatrix;
 
-attribute vec3 color;
-varying vec3 vColor;
+attribute vec2 texcoords;
+varying vec2 vTexcoords;
 varying vec3 vPosition;
 
 void main(void) {
   gl_Position = Pmatrix * Vmatrix * vec4(position, 1.);
-  vColor = color;
+  vTexcoords = texcoords;
   vPosition = position;
 }
 `
 
 const shader_basic_frag = `
 precision mediump float;
+uniform sampler2D u_texture;
 varying vec3 vPosition;
-varying vec3 vColor;
+varying vec2 vTexcoords;
 void main(void) {
-  gl_FragColor = vec4(vColor, 1.);
+  gl_FragColor = texture2D(u_texture, vTexcoords);
 }
 `

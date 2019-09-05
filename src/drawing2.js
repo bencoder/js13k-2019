@@ -2,26 +2,38 @@ const Drawing = function(canvas) {
   const gl = canvas.getContext('webgl')
   const Telement = document.getElementById('T')
 
+  const textures = getTextures(gl)
+
   const scale = 1 / 100
 
   function build() {
     const vertices = []
-    const colors = []
+    const texcoords = []
     const indices = []
 
     const vertexMap = new Map()
     const getVertex = (x, y, z, type = 0) => {
-      const key = JSON.stringify([x, y, z, type])
+      let tx
+      let ty
+      if (type === 0 || type === 1) {
+        tx = x
+        ty = z
+      } else if (type === 2) {
+        tx = x
+        ty = y + z
+      } else {
+        tx = x
+        ty = y + z
+      }
+      tx *= scale * 4
+      ty *= scale * 4
+      const key = JSON.stringify([x, y, z, tx, ty])
       let result = vertexMap.get(key)
       if (result === undefined) {
         result = vertexMap.size
         vertexMap.set(key, result)
         vertices.push(-x * scale, y * scale, z * scale)
-        if (type === 0) {
-          colors.push(1, 1, 1)
-        } else {
-          colors.push(0.3, 0.3, type)
-        }
+        texcoords.push(tx, ty)
       }
       return result
     }
@@ -51,7 +63,7 @@ const Drawing = function(canvas) {
           const a = new Vec2(poly[i].x, poly[i].y)
           const bb = poly[(i + 1) % poly.length]
           const b = new Vec2(bb.x, bb.y)
-          makeWallQuad(a.x, 1, a.y, b.x, 100, b.y, 0.1)
+          makeWallQuad(a.x, 1, a.y, b.x, 100, b.y, 3)
 
           const normal = a.sub(b).normal()
           const width = 5
@@ -63,20 +75,20 @@ const Drawing = function(canvas) {
             b.sub(normal.mul(width / 2)),
             a.sub(normal.mul(width / 2))
           ]
-          makeWallQuad(quad[0].x, bottomY, quad[0].y, quad[1].x, topY, quad[1].y, 0.2)
-          makeFloorQuad(quad[2].x, topY, quad[2].y, quad[0].x, topY, quad[0].y, 0.2) //top
-          makeWallQuad(quad[2].x, bottomY, quad[2].y, quad[3].x, topY, quad[3].y, 0.2)
+          makeWallQuad(quad[0].x, bottomY, quad[0].y, quad[1].x, topY, quad[1].y, 2)
+          makeFloorQuad(quad[2].x, topY, quad[2].y, quad[0].x, topY, quad[0].y, 1) //top
+          makeWallQuad(quad[2].x, bottomY, quad[2].y, quad[3].x, topY, quad[3].y, 2)
           const quad2 = [
             a.add({ x: 7, y: 7 }), //front-right
             a.add({ x: 7, y: -7 }), //back-right
             a.add({ x: -7, y: -7 }), //back-left
             a.add({ x: -7, y: 7 }) //front-left
           ]
-          makeWallQuad(quad2[0].x, bottomY, quad2[0].y, quad2[3].x, topY, quad2[3].y, 0.2) //front
-          makeWallQuad(quad2[2].x, bottomY, quad2[2].y, quad2[3].x, topY, quad2[3].y, 0.2) //left
-          makeFloorQuad(quad2[3].x, topY, quad2[3].y, quad2[1].x, topY, quad2[1].y, 0.2) //top
-          makeWallQuad(quad2[0].x, bottomY, quad2[0].y, quad2[1].x, topY, quad2[1].y, 0.2) //right
-          makeWallQuad(quad2[1].x, bottomY, quad2[1].y, quad2[2].x, topY, quad2[2].y, 0.2) //back
+          makeWallQuad(quad2[0].x, bottomY, quad2[0].y, quad2[3].x, topY, quad2[3].y, 2) //front
+          makeWallQuad(quad2[2].x, bottomY, quad2[2].y, quad2[3].x, topY, quad2[3].y, 2) //left
+          makeFloorQuad(quad2[3].x, topY, quad2[3].y, quad2[1].x, topY, quad2[1].y, 1) //top
+          makeWallQuad(quad2[0].x, bottomY, quad2[0].y, quad2[1].x, topY, quad2[1].y, 2) //right
+          makeWallQuad(quad2[1].x, bottomY, quad2[1].y, quad2[2].x, topY, quad2[2].y, 2) //back
         }
       }
 
@@ -96,7 +108,7 @@ const Drawing = function(canvas) {
 
     return {
       vertices: new Float32Array(vertices),
-      colors: new Float32Array(colors),
+      texcoords: new Float32Array(texcoords),
       indices: new Uint16Array(indices)
     }
   }
@@ -108,10 +120,10 @@ const Drawing = function(canvas) {
   gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
   gl.bufferData(gl.ARRAY_BUFFER, built.vertices, gl.STATIC_DRAW)
 
-  // Create and store data into color buffer
-  const color_buffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer)
-  gl.bufferData(gl.ARRAY_BUFFER, built.colors, gl.STATIC_DRAW)
+  // Create and store data into texture coords buffer
+  const texcoords_buffer = gl.createBuffer()
+  gl.bindBuffer(gl.ARRAY_BUFFER, texcoords_buffer)
+  gl.bufferData(gl.ARRAY_BUFFER, built.texcoords, gl.STATIC_DRAW)
 
   // Create and store data into index buffer
   const index_buffer = gl.createBuffer()
@@ -150,9 +162,9 @@ const Drawing = function(canvas) {
   const Pmatrix = gl.getUniformLocation(shaderProgram, 'Pmatrix')
   const Vmatrix = gl.getUniformLocation(shaderProgram, 'Vmatrix')
   const position = gl.getAttribLocation(shaderProgram, 'position')
-  const color = gl.getAttribLocation(shaderProgram, 'color')
+  const texcoords = gl.getAttribLocation(shaderProgram, 'texcoords')
 
-  const cubeRenderer = makeCubeRenderer(gl, position, color)
+  //const cubeRenderer = makeCubeRenderer(gl, position, color)
 
   this.scale = 1.5
 
@@ -204,19 +216,21 @@ const Drawing = function(canvas) {
   }
 
   this.level = level => {
+    gl.bindTexture(gl.TEXTURE_2D, textures.t1)
+
     gl.useProgram(shaderProgram)
 
     gl.uniformMatrix4fv(Pmatrix, false, projectionMatrix)
     gl.uniformMatrix4fv(Vmatrix, false, viewMatrix)
-    cubeRenderer()
+    //cubeRenderer()
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
     gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(position)
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer)
-    gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(color)
+    gl.bindBuffer(gl.ARRAY_BUFFER, texcoords_buffer)
+    gl.vertexAttribPointer(texcoords, 2, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(texcoords)
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer)
 

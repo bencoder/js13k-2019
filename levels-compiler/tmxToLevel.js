@@ -1,9 +1,11 @@
 const { tmxParse, tmxArray, tmxObjectProperties, tmxPolygonPoints } = require('./tmx')
+const { orderClockwise, absHol } = require('fernandez-polygon-decomposition')
 
 function tmxToLevel(xmlText, id) {
   const level = {
     id,
     walls: [],
+    polys: [],
     doors: [],
     switches: [],
     start: { x: 0, y: 0 },
@@ -13,7 +15,10 @@ function tmxToLevel(xmlText, id) {
   const objectTypeMapping = {
     wall(object) {
       for (const polygon of tmxArray(object.polygon)) {
-        level.walls.push(tmxPolygonPoints(polygon.points, object.x, object.y))
+        const points = orderClockwise(tmxPolygonPoints(polygon.points, object.x, object.y))
+
+        level.polys.push(...absHol(points))
+        level.walls.push(points)
       }
     },
 

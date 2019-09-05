@@ -5,7 +5,7 @@ const fs = require('fs')
 const tmxToLevel = require('./tmxToLevel')
 const prettier = require('prettier')
 
-const levelsFolder = path.resolve(__dirname, '../src/levels')
+const levelsFolder = path.resolve(__dirname, '../levels')
 const outputLevelsFilePath = path.resolve(__dirname, '../src/levels.js')
 
 const levelNames = fs

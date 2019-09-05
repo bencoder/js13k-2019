@@ -19,6 +19,9 @@ function Game(levels) {
       g.reset()
     }
     ghosts.push(new Ghost(history, level))
+    if (ghosts.length > Settings.maxGhosts) {
+      ghosts.shift()
+    }
     currentTick = 0
     history = []
 
@@ -30,6 +33,7 @@ function Game(levels) {
   }
 
   const die = () => {
+    Sounds.death()
     state = STATE_DEAD
   }
 
@@ -74,10 +78,11 @@ function Game(levels) {
     if (state === STATE_PLAY) {
       if (level.completed) {
         this.loadLevel(currentLevel + 1)
+        Sounds.win()
         return
       }
       if (currentTick === Settings.timeToDie * Settings.tps) {
-        state = STATE_DEAD
+        die()
         return
       }
       history[currentTick] = player.move(buttons)
@@ -92,7 +97,7 @@ function Game(levels) {
   this.buttonDown = key => {
     buttons[key] = true
     if (key === 'back') {
-      state = STATE_DEAD
+      die()
     }
     if (state === STATE_TITLE) {
       state = STATE_PLAY

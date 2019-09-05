@@ -1,0 +1,3 @@
+[submodule "jsfxr"]
+	path = jsfxr
+	url = git@github.com:mneubrand/jsfxr.git

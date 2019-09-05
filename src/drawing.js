@@ -1,7 +1,7 @@
 const Drawing = function(c) {
   let screenWidth
   let screenHeight
-  const scale = 1.5
+  this.scale = 1.5
   const setScreen = () => {
     screenWidth = c.width = c.clientWidth
     screenHeight = c.height = c.clientHeight
@@ -11,10 +11,6 @@ const Drawing = function(c) {
 
   const ctx = c.getContext('2d')
 
-  const patterns = {
-    grass: ctx.createPattern(grass, 'repeat')
-  }
-
   let camera = { x: 0, y: 0 }
   this.accumulator = 0
 
@@ -23,8 +19,8 @@ const Drawing = function(c) {
   }
 
   const worldToScreen = ({ x, y }) => ({
-    x: (x - camera.x) * scale + screenWidth / 2,
-    y: (y - camera.y) * scale + screenHeight / 2
+    x: (x - camera.x) * this.scale + screenWidth / 2,
+    y: (y - camera.y) * this.scale + screenHeight / 2
   })
 
   const color = clr => {
@@ -44,7 +40,7 @@ const Drawing = function(c) {
   const circle = (center, r, fill = false) => {
     const { x, y } = worldToScreen(center)
     ctx.beginPath()
-    ctx.arc(x, y, r * scale, 0, 2 * Math.PI)
+    ctx.arc(x, y, r * this.scale, 0, 2 * Math.PI)
     ctx.stroke()
     if (fill) {
       ctx.fill()
@@ -53,10 +49,10 @@ const Drawing = function(c) {
 
   const image = (pos, img) => {
     const p = worldToScreen(pos)
-    if (p.x < -img.width * scale || p.y < -img.height * scale || p.x > screenWidth || p.y > screenHeight) {
+    if (p.x < -img.width * this.scale || p.y < -img.height * this.scale || p.x > screenWidth || p.y > screenHeight) {
       return
     }
-    ctx.drawImage(img, p.x, p.y, img.width * scale, img.height * scale)
+    ctx.drawImage(img, p.x, p.y, img.width * this.scale, img.height * this.scale)
   }
 
   const imageLine = (p1, p2, tex) => {
@@ -166,5 +162,24 @@ const Drawing = function(c) {
 
     color('red')
     circle(level.end, Settings.switchRadius, true)
+  }
+
+  this.titleScreen = () => {
+    ctx.fillStyle = '#F00'
+    ctx.font = '100px serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('13 seconds to die', screenWidth / 2, screenHeight / 2)
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'top'
+  }
+  this.endScreen = () => {
+    ctx.fillStyle = '#F00'
+    ctx.font = '100px serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('You win!', screenWidth / 2, screenHeight / 2)
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'top'
   }
 }

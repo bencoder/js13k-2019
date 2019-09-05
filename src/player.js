@@ -2,6 +2,11 @@ function Player(level) {
   this.position = level.getStart()
   this.movementVector = new Vec2(0, 0) //stores last movement vector
 
+  this.forceMove = v => {
+    this.movementVector = v
+    this.position = this.position.add(v)
+  }
+
   this.move = buttons => {
     const movement = new Vec2(0, 0)
 

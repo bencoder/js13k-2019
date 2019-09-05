@@ -90,7 +90,6 @@ function Game(levels) {
         g.tick(currentTick)
       }
       ++currentTick
-      
     }
   }
 

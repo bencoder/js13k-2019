@@ -16,7 +16,7 @@ const Drawing = function(canvas) {
       if (result === undefined) {
         result = vertexMap.size
         vertexMap.set(key, result)
-        vertices.push(x * scale, y, z * scale)
+        vertices.push(-x * scale, y, z * scale)
         if (type === 0) {
           colors.push(1, 1, 1)
         } else {
@@ -34,25 +34,30 @@ const Drawing = function(canvas) {
       indices.push(p0, p3, p1, p0, p2, p3)
     }
 
-    const level = levels[0]
+    for (const level of levels) {
+      const indexBufferOffset = indices.length
 
-    const walls = level.walls
-    for (const poly of walls) {
-      for (let i = 0; i < poly.length; ++i) {
-        const a = poly[i]
-        const b = poly[(i + 1) % poly.length]
-        makeWallQuad(a.x, 1, a.y, b.x, 100, b.y)
+      const walls = level.walls
+      for (const poly of walls) {
+        for (let i = 0; i < poly.length; ++i) {
+          const a = poly[i]
+          const b = poly[(i + 1) % poly.length]
+          makeWallQuad(a.x, 1, a.y, b.x, 100, b.y)
+        }
       }
-    }
 
-    for (const pts of level.polys) {
-      const p0 = pts[0]
-      let pHelper = pts[1]
-      for (let i = 2; i < pts.length; ++i) {
-        const pTemp = pts[i]
-        indices.push(getVertex(p0.x, 1, p0.y), getVertex(pHelper.x, 1, pHelper.y), getVertex(pTemp.x, 1, pTemp.y))
-        pHelper = pTemp
+      for (const pts of level.polys) {
+        const p0 = pts[0]
+        let pHelper = pts[1]
+        for (let i = 2; i < pts.length; ++i) {
+          const pTemp = pts[i]
+          indices.push(getVertex(p0.x, 1, p0.y), getVertex(pHelper.x, 1, pHelper.y), getVertex(pTemp.x, 1, pTemp.y))
+          pHelper = pTemp
+        }
       }
+
+      level.indexBufferOffset = indexBufferOffset
+      level.indexBufferLength = indices.length - indexBufferOffset
     }
 
     return {
@@ -125,7 +130,7 @@ const Drawing = function(canvas) {
 
   this.setCamera = (position, movementVector) => {
     const camera = interpolate(position, movementVector)
-    playerPos[0] = camera.x * scale
+    playerPos[0] = -camera.x * scale
     playerPos[2] = camera.y * scale
     // TODO - update view matrix
   }
@@ -181,7 +186,7 @@ const Drawing = function(canvas) {
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer)
 
-    gl.drawElements(gl.TRIANGLES, built.indices.length, gl.UNSIGNED_SHORT, 0)
+    gl.drawElements(gl.TRIANGLES, level.indexBufferLength, gl.UNSIGNED_SHORT, level.indexBufferOffset * 2)
   }
 
   this.titleScreen = () => {}

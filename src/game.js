@@ -10,7 +10,7 @@ function Game(levels) {
   let currentTick = 0
   let history = []
   let currentLevel = 0
-  let state = STATE_TITLE
+  let state = STATE_PLAY //STATE_TITLE
 
   const buttons = {}
 
@@ -90,7 +90,7 @@ function Game(levels) {
         g.tick(currentTick)
       }
       ++currentTick
-      return
+      
     }
   }
 

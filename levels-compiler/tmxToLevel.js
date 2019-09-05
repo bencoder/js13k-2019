@@ -17,7 +17,7 @@ function tmxToLevel(xmlText, id) {
       for (const polygon of tmxArray(object.polygon)) {
         const points = orderClockwise(tmxPolygonPoints(polygon.points, object.x, object.y))
 
-        level.polys.push(...absHol(points))
+        level.polys.push(...absHol(points).map(orderClockwise))
         level.walls.push(points)
       }
     },

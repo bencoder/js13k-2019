@@ -16,21 +16,29 @@ const Drawing = function(canvas) {
       if (result === undefined) {
         result = vertexMap.size
         vertexMap.set(key, result)
-        vertices.push(-x * scale, y, z * scale)
+        vertices.push(-x * scale, y * scale, z * scale)
         if (type === 0) {
           colors.push(1, 1, 1)
         } else {
-          colors.push(0.3, 0.3, 0.4)
+          colors.push(0.3, 0.3, type)
         }
       }
       return result
     }
 
-    const makeWallQuad = (x1, y1, z1, x2, y2, z2) => {
-      const p0 = getVertex(x1, y1, z1, 1)
-      const p1 = getVertex(x2, y1, z2, 1)
-      const p2 = getVertex(x1, y2, z1, 1)
-      const p3 = getVertex(x2, y2, z2, 1)
+    const makeWallQuad = (x1, y1, z1, x2, y2, z2, type) => {
+      const p0 = getVertex(x1, y1, z1, type)
+      const p1 = getVertex(x2, y1, z2, type)
+      const p2 = getVertex(x1, y2, z1, type)
+      const p3 = getVertex(x2, y2, z2, type)
+      indices.push(p0, p3, p1, p0, p2, p3)
+    }
+
+    const makeFloorQuad = (aX, aY, aZ, bX, bY, bZ, type) => {
+      const p0 = getVertex(aX, aY, aZ, type)
+      const p1 = getVertex(aX, bY, bZ, type)
+      const p2 = getVertex(bX, aY, aZ, type)
+      const p3 = getVertex(bX, bY, bZ, type)
       indices.push(p0, p3, p1, p0, p2, p3)
     }
 
@@ -40,9 +48,35 @@ const Drawing = function(canvas) {
       const walls = level.walls
       for (const poly of walls) {
         for (let i = 0; i < poly.length; ++i) {
-          const a = poly[i]
-          const b = poly[(i + 1) % poly.length]
-          makeWallQuad(a.x, 1, a.y, b.x, 100, b.y)
+          const a = new Vec2(poly[i].x, poly[i].y)
+          const bb = poly[(i + 1) % poly.length]
+          const b = new Vec2(bb.x, bb.y)
+          makeWallQuad(a.x, 1, a.y, b.x, 100, b.y, 0.1)
+
+          const normal = a.sub(b).normal()
+          const width = 5
+          const topY = -10
+          const bottomY = 1
+          const quad = [
+            a.add(normal.mul(width / 2)),
+            b.add(normal.mul(width / 2)),
+            b.sub(normal.mul(width / 2)),
+            a.sub(normal.mul(width / 2))
+          ]
+          makeWallQuad(quad[0].x, bottomY, quad[0].y, quad[1].x, topY, quad[1].y, 0.2)
+          makeFloorQuad(quad[2].x, topY, quad[2].y, quad[0].x, topY, quad[0].y, 0.2) //top
+          makeWallQuad(quad[2].x, bottomY, quad[2].y, quad[3].x, topY, quad[3].y, 0.2)
+          const quad2 = [
+            a.add({ x: 7, y: 7 }), //front-right
+            a.add({ x: 7, y: -7 }), //back-right
+            a.add({ x: -7, y: -7 }), //back-left
+            a.add({ x: -7, y: 7 }) //front-left
+          ]
+          makeWallQuad(quad2[0].x, bottomY, quad2[0].y, quad2[3].x, topY, quad2[3].y, 0.2) //front
+          makeWallQuad(quad2[2].x, bottomY, quad2[2].y, quad2[3].x, topY, quad2[3].y, 0.2) //left
+          makeFloorQuad(quad2[3].x, topY, quad2[3].y, quad2[1].x, topY, quad2[1].y, 0.2) //top
+          makeWallQuad(quad2[0].x, bottomY, quad2[0].y, quad2[1].x, topY, quad2[1].y, 0.2) //right
+          makeWallQuad(quad2[1].x, bottomY, quad2[1].y, quad2[2].x, topY, quad2[2].y, 0.2) //back
         }
       }
 
@@ -89,7 +123,7 @@ const Drawing = function(canvas) {
 
   let playerRotX = 0
   let playerRotY = 0
-  const playerPos = [0, 0, 2]
+  const playerPos = [0, -1, 2]
   const viewMatrix = new Float32Array(16)
   const projectionMatrix = new Float32Array(16)
   calcProjectionMatrix()

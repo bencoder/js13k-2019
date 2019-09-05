@@ -25,6 +25,9 @@ function Player(level) {
 
     this.movementVector = level.interact(this.position, Settings.playerRadius, movement)
     this.position = this.position.add(this.movementVector)
+    if (this.movementVector.x != 0 || this.movementVector.y != 0) {
+      Sounds.step()
+    }
 
     return this.movementVector
   }

@@ -71,9 +71,6 @@ const Drawing = function(canvas) {
     }
 
     for (const level of levels) {
-      if (level.id !== 1) {
-        continue
-      }
       const indexBufferOffset = indices.length
 
       const walls = level.walls

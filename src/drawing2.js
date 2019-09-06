@@ -1,4 +1,4 @@
-const Drawing = function(canvas) {
+const Drawing = function (canvas) {
   const gl = canvas.getContext('webgl')
   const Telement = document.getElementById('T')
 
@@ -231,6 +231,28 @@ const Drawing = function(canvas) {
         s.indexBufferOffset = o
         s.indexBufferLength = l
       }
+
+
+      const doorTop = -10
+      for (const d of level.doors) {
+        const p = d.polygon;
+        if (p.length < 4) continue; //Doors must have 4 corners
+        const bottom = [
+          [p[0].x, 1, p[0].y],
+          [p[1].x, 1, p[1].y],
+          [p[2].x, 1, p[2].y],
+          [p[3].x, 1, p[3].y],
+        ];
+        const top = [
+          [p[0].x, doorTop, p[0].y],
+          [p[1].x, doorTop, p[1].y],
+          [p[2].x, doorTop, p[2].y],
+          [p[3].x, doorTop, p[3].y],
+        ];
+        const [o, l] = makeFrustrum(bottom, top);
+        d.indexBufferOffset = o
+        d.indexBufferLength = l
+      }
     }
 
     return {
@@ -344,11 +366,12 @@ const Drawing = function(canvas) {
     // TODO interpolate(ghost.position, ghost.movementVector), 10
   }
 
+
   this.level = level => {
     gl.bindTexture(gl.TEXTURE_2D, textures.t1)
 
-    gl.enable(gl.CULL_FACE)
-    gl.cullFace(gl.BACK)
+    //  gl.enable(gl.CULL_FACE)
+    //  gl.cullFace(gl.BACK)
 
     gl.useProgram(shaderProgram)
 
@@ -357,6 +380,9 @@ const Drawing = function(canvas) {
     gl.uniform3fv(uPlayerLightPosition, playerLightPosition)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
+
+
+
     gl.vertexAttribPointer(uPosition, 3, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(uPosition)
 
@@ -383,11 +409,15 @@ const Drawing = function(canvas) {
         gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
       }
     }
+    for (d of level.doors) {
+      if (d.open) continue;
+      gl.drawElements(gl.TRIANGLES, d.indexBufferLength, gl.UNSIGNED_SHORT, d.indexBufferOffset * 2)
+    }
   }
 
-  this.titleScreen = () => {}
+  this.titleScreen = () => { }
 
-  this.endScreen = () => {}
+  this.endScreen = () => { }
 
   function calcViewMatrix(out = viewMatrix) {
     mat4.identity(out)

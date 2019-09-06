@@ -12,7 +12,7 @@
    <properties>
     <property name="open" type="bool" value="false"/>
    </properties>
-   <polygon points="0,0 64,0 0,0"/>
+   <polygon points="0,0 64,0 64.1818,6.54545 0.181818,6.54545"/>
   </object>
   <object id="6" name="switch1" type="switch" x="768" y="672">
    <properties>
@@ -25,7 +25,7 @@
    <properties>
     <property name="open" type="bool" value="false"/>
    </properties>
-   <polygon points="0,-256 0,-256 64,-256"/>
+   <polygon points="0,-256 0.0909091,-249.455 64.0909,-249.455 64,-256"/>
   </object>
   <object id="9" name="switch2" type="switch" x="640" y="672">
    <properties>

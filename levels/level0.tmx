@@ -21,7 +21,7 @@
    <properties>
     <property name="open" type="bool" value="false"/>
    </properties>
-   <polygon points="0,0 64,0 0,0"/>
+   <polygon points="0,0 64,0 63.9091,9.09091 0.181818,9.09091"/>
   </object>
  </objectgroup>
 </map>

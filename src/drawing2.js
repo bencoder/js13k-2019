@@ -39,13 +39,9 @@ const Drawing = function(canvas) {
       const ny = uz * vx - ux * vz
       const nz = ux * vy - uy * vx
 
-      const len2 = nx * nx + ny * ny + nz * nz
-      if (len2 <= 0.00000001) {
-        return [0, 1, 0]
-      }
+      const len = Math.sqrt(nx * nx + ny * ny + nz * nz)
 
-      const len = 1 / Math.sqrt(len2)
-      return [nx * len, ny * len, nz * len]
+      return [nx / len, ny / len, nz / len]
     }
 
     const makeWallQuad = (aX, aY, aZ, bX, bY, bZ, tshift, segmentLength) => {
@@ -66,26 +62,34 @@ const Drawing = function(canvas) {
     }
 
     const makeQuad = (v0, v1, v2, v3) => {
-      const n = getTriangleNormal(v0[0], v3[0], v1[0])
+      const n = getTriangleNormal(v0[0], v1[0], v2[0])
       const i0 = getVertex(...v0, n)
       const i1 = getVertex(...v1, n)
       const i2 = getVertex(...v2, n)
       const i3 = getVertex(...v3, n)
-      indices.push(i0, i3, i1, i0, i2, i3)
+      indices.push(i2, i1, i0, i3, i1, i2)
     }
 
     for (const level of levels) {
+      if (level.id !== 1) {
+        continue
+      }
       const indexBufferOffset = indices.length
 
       const walls = level.walls
       for (const poly of walls) {
         let perimeter0 = 0
         for (let i = 0; i < poly.length; ++i) {
-          const a = new Vec2(poly[i].x, poly[i].y)
-          const bb = poly[(i + 1) % poly.length]
-          const b = new Vec2(bb.x, bb.y)
+          const poly0 = poly[i]
+          const poly1 = poly[(i + 1) % poly.length]
 
-          //polyWallPerimeter += makeWallQuad(a.x, 1, a.y, b.x, 100, b.y, 3, polyWallPerimeter)
+          const a = new Vec2(poly0.x, poly0.y)
+          const b = new Vec2(poly1.x, poly1.y)
+
+          const segmentLength = Math.hypot(b.x - a.x, b.y - a.y)
+          if (segmentLength === 0) {
+            continue
+          }
 
           const width = 5
           const topY = -10
@@ -93,7 +97,6 @@ const Drawing = function(canvas) {
           const bottomY = 1
           const deepdown = 300
 
-          const segmentLength = Math.hypot(b.x - a.x, b.y - a.y)
           const perimeter1 = perimeter0 + segmentLength
 
           const height = bottomY - topY
@@ -131,21 +134,15 @@ const Drawing = function(canvas) {
 
           // top
           makeQuad(
-            [[border[0].x, topY, border[0].y], [border[0].x, border[0].y]],
             [[border[1].x, topY, border[1].y], [border[1].x, border[1].y]],
-            [[border[3].x, topY, border[3].y], [border[3].x, border[3].y]],
-            [[border[2].x, topY, border[2].y], [border[2].x, border[2].y]]
+            [[border[0].x, topY, border[0].y], [border[0].x, border[0].y]],
+            [[border[2].x, topY, border[2].y], [border[2].x, border[2].y]],
+            [[border[3].x, topY, border[3].y], [border[3].x, border[3].y]]
           )
-          /*
-          makeQuad(
-            [[quad[0].x, topY, quad[0].y], [quad[0].x, quad[0].y]],
-            [[quad[1].x, topY, quad[1].y], [quad[1].x, quad[1].y]],
-            [[quad[3].x, topY, quad[3].y], [quad[3].x, quad[3].y]],
-            [[quad[2].x, topY, quad[2].y], [quad[2].x, quad[2].y]]
-          )
-          */
 
           /*
+ 
+
           const quad2 = [
             a.add({ x: 7, y: 7 }), //front-right
             a.add({ x: 7, y: -7 }), //back-right
@@ -247,11 +244,12 @@ const Drawing = function(canvas) {
   }
 
   this.setCamera = (position, movementVector) => {
-    playerLightPosition[0] = -position.x * scale
-    playerLightPosition[1] = -0.4
-    playerLightPosition[2] = position.y * scale
-
     const camera = interpolate(position, movementVector)
+
+    playerLightPosition[0] = -camera.x * scale
+    playerLightPosition[1] = -0.5
+    playerLightPosition[2] = camera.y * scale
+
     cameraPos[0] = -camera.x * scale
     cameraPos[1] = -1 - this.scale
     cameraPos[2] = 1 + camera.y * scale
@@ -293,6 +291,9 @@ const Drawing = function(canvas) {
 
   this.level = level => {
     gl.bindTexture(gl.TEXTURE_2D, textures.t1)
+
+    gl.enable(gl.CULL_FACE)
+    gl.cullFace(gl.FRONT)
 
     gl.useProgram(shaderProgram)
 

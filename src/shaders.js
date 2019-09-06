@@ -13,7 +13,7 @@ varying highp vec3 vLight;
 varying highp vec3 vSurfaceToPlayerLight;
 
 void main(void) {
-  highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
+  vec3 ambientLight = vec3(0.3, 0.3, 0.3);
   highp vec3 directionalLightColor = vec3(1, 1, 1);
   highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
 
@@ -37,8 +37,10 @@ varying highp vec3 vSurfaceToPlayerLight;
 void main(void) {
   highp vec4 texelColor = texture2D(u_texture, vTexcoords);
 
+  vec3 normal = normalize(vNormal);
   vec3 surfaceToLightDirection = normalize(vSurfaceToPlayerLight);
-  float playerLight = 2. * dot(vNormal, surfaceToLightDirection);
+
+  float playerLight = 2. * dot(normal, surfaceToLightDirection);
 
   vec3 light = mix(vLight.xyz, vec3(playerLight, playerLight, playerLight), 0.9);
 

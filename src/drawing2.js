@@ -91,7 +91,7 @@ const Drawing = function(canvas) {
           const topY = -10
           const pillarY = -15
           const bottomY = 1
-          const deepdown = 100
+          const deepdown = 300
 
           const segmentLength = Math.hypot(b.x - a.x, b.y - a.y)
           const perimeter1 = perimeter0 + segmentLength
@@ -205,11 +205,13 @@ const Drawing = function(canvas) {
   const canvasWidth = canvas.clientWidth
   const canvasHeight = canvas.clientHeight
 
-  let playerRotX = 0
-  let playerRotY = 0
-  const playerPos = [0, -1, 2]
+  let cameraRotX = 1
+  let cameraRotY = 0
+  const cameraPos = [0, -1, 2]
+
   const viewMatrix = new Float32Array(16)
   const projectionMatrix = new Float32Array(16)
+  const playerLightPosition = new Float32Array(3)
   calcProjectionMatrix()
 
   const createGlShasder = (program, input, type) => {
@@ -229,11 +231,12 @@ const Drawing = function(canvas) {
   }
 
   /* ====== Associating attributes to vertex shader =====*/
-  const Pmatrix = gl.getUniformLocation(shaderProgram, 'Pmatrix')
-  const Vmatrix = gl.getUniformLocation(shaderProgram, 'Vmatrix')
-  const position = gl.getAttribLocation(shaderProgram, 'position')
-  const normal = gl.getAttribLocation(shaderProgram, 'normal')
-  const texcoords = gl.getAttribLocation(shaderProgram, 'texcoords')
+  const uPmatrix = gl.getUniformLocation(shaderProgram, 'Pmatrix')
+  const uVmatrix = gl.getUniformLocation(shaderProgram, 'Vmatrix')
+  const uPosition = gl.getAttribLocation(shaderProgram, 'position')
+  const uNormal = gl.getAttribLocation(shaderProgram, 'normal')
+  const uTexcoords = gl.getAttribLocation(shaderProgram, 'texcoords')
+  const uPlayerLightPosition = gl.getUniformLocation(shaderProgram, 'playerLightPosition')
 
   this.scale = 1.5
 
@@ -244,10 +247,14 @@ const Drawing = function(canvas) {
   }
 
   this.setCamera = (position, movementVector) => {
+    playerLightPosition[0] = -position.x * scale
+    playerLightPosition[1] = -0.4
+    playerLightPosition[2] = position.y * scale
+
     const camera = interpolate(position, movementVector)
-    playerPos[0] = -camera.x * scale
-    playerPos[2] = camera.y * scale
-    // TODO - update view matrix
+    cameraPos[0] = -camera.x * scale
+    cameraPos[1] = -1 - this.scale
+    cameraPos[2] = 1 + camera.y * scale
   }
 
   this.bg = () => {
@@ -289,24 +296,26 @@ const Drawing = function(canvas) {
 
     gl.useProgram(shaderProgram)
 
-    gl.uniformMatrix4fv(Pmatrix, false, projectionMatrix)
-    gl.uniformMatrix4fv(Vmatrix, false, viewMatrix)
+    gl.uniformMatrix4fv(uPmatrix, false, projectionMatrix)
+    gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
-    gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(position)
+    gl.vertexAttribPointer(uPosition, 3, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(uPosition)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer)
-    gl.vertexAttribPointer(normal, 3, gl.FLOAT, true, 0, 0)
-    gl.enableVertexAttribArray(normal)
+    gl.vertexAttribPointer(uNormal, 3, gl.FLOAT, true, 0, 0)
+    gl.enableVertexAttribArray(uNormal)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, texcoords_buffer)
-    gl.vertexAttribPointer(texcoords, 2, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(texcoords)
+    gl.vertexAttribPointer(uTexcoords, 2, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(uTexcoords)
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer)
 
     gl.drawElements(gl.TRIANGLES, level.indexBufferLength, gl.UNSIGNED_SHORT, level.indexBufferOffset * 2)
+
+    gl.uniform3fv(uPlayerLightPosition, playerLightPosition)
   }
 
   this.titleScreen = () => {}
@@ -315,10 +324,10 @@ const Drawing = function(canvas) {
 
   function calcViewMatrix(out = viewMatrix) {
     mat4.identity(out)
-    mat4.rotateX(out, out, playerRotX)
-    mat4.rotateY(out, out, playerRotY)
+    mat4.rotateX(out, out, cameraRotX)
+    mat4.rotateY(out, out, cameraRotY)
     mat4.rotateZ(out, out, -Math.PI)
-    mat4.translate(out, out, [-playerPos[0], -playerPos[1], -playerPos[2]])
+    mat4.translate(out, out, [-cameraPos[0], -cameraPos[1], -cameraPos[2]])
   }
 
   function calcProjectionMatrix() {
@@ -340,19 +349,19 @@ const Drawing = function(canvas) {
     canvas.addEventListener('mousemove', e => {
       if (pointerLocked) {
         const camRotSpeed = 0.01
-        playerRotY += (e.movementX || 0) * camRotSpeed
-        if (playerRotY < 0) {
-          playerRotY += Math.PI * 2
+        cameraRotY += (e.movementX || 0) * camRotSpeed
+        if (cameraRotY < 0) {
+          cameraRotY += Math.PI * 2
         }
-        if (playerRotY >= Math.PI * 2) {
-          playerRotY -= Math.PI * 2
+        if (cameraRotY >= Math.PI * 2) {
+          cameraRotY -= Math.PI * 2
         }
-        playerRotX += (e.movementY || 0) * camRotSpeed
-        if (playerRotX < -Math.PI * 0.5) {
-          playerRotX = -Math.PI * 0.5
+        cameraRotX += (e.movementY || 0) * camRotSpeed
+        if (cameraRotX < -Math.PI * 0.5) {
+          cameraRotX = -Math.PI * 0.5
         }
-        if (playerRotX > Math.PI * 0.5) {
-          playerRotX = Math.PI * 0.5
+        if (cameraRotX > Math.PI * 0.5) {
+          cameraRotX = Math.PI * 0.5
         }
       }
     })

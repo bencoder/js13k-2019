@@ -1,13 +1,16 @@
 const shader_basic_vert = `
 uniform mat4 Pmatrix;
 uniform mat4 Vmatrix;
+uniform vec3 playerLightPosition;
 
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec2 texcoords;
 
 varying highp vec2 vTexcoords;
+varying highp vec3 vNormal;
 varying highp vec3 vLight;
+varying highp vec3 vSurfaceToPlayerLight;
 
 void main(void) {
   highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
@@ -18,6 +21,8 @@ void main(void) {
 
   gl_Position = Pmatrix * Vmatrix * vec4(position, 1.);
   vLight = ambientLight + (directionalLightColor * directional);
+  vSurfaceToPlayerLight = position - playerLightPosition;
+  vNormal = normal;
   vTexcoords = texcoords;
 }
 `
@@ -26,9 +31,17 @@ const shader_basic_frag = `
 precision mediump float;
 uniform sampler2D u_texture;
 varying highp vec2 vTexcoords;
+varying highp vec3 vNormal;
 varying highp vec3 vLight;
+varying highp vec3 vSurfaceToPlayerLight;
 void main(void) {
   highp vec4 texelColor = texture2D(u_texture, vTexcoords);
-  gl_FragColor = vec4(texelColor.rgb * vLight, texelColor.a);;
+
+  vec3 surfaceToLightDirection = normalize(vSurfaceToPlayerLight);
+  float playerLight = 2. * dot(vNormal, surfaceToLightDirection);
+
+  vec3 light = mix(vLight.xyz, vec3(playerLight, playerLight, playerLight), 0.9);
+
+  gl_FragColor = vec4(texelColor.rgb * light, texelColor.a);;
 }
 `

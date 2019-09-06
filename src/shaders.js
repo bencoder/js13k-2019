@@ -1,7 +1,7 @@
 const shader_basic_vert = `
 uniform mat4 Pmatrix;
 uniform mat4 Vmatrix;
-uniform vec3 playerLightPosition;
+uniform highp vec3 playerLightPosition;
 
 attribute vec3 position;
 attribute vec3 normal;
@@ -9,19 +9,14 @@ attribute vec2 texcoords;
 
 varying highp vec2 vTexcoords;
 varying highp vec3 vNormal;
-varying highp vec3 vLight;
-varying highp vec3 vSurfaceToPlayerLight;
+varying highp vec3 vPosition;
 
 void main(void) {
-  vec3 ambientLight = vec3(0.3, 0.3, 0.3);
   highp vec3 directionalLightColor = vec3(1, 1, 1);
-  highp vec3 directionalVector = normalize(vec3(0.85, 0.8, 0.75));
-
-  highp float directional = max(dot(normal, directionalVector), 0.0);
+  highp vec3 directionalVector = normalize(vec3(0.5, 0.5, 0.5));
 
   gl_Position = Pmatrix * Vmatrix * vec4(position, 1.);
-  vLight = ambientLight + (directionalLightColor * directional);
-  vSurfaceToPlayerLight = position - playerLightPosition;
+  vPosition = position;
   vNormal = normal;
   vTexcoords = texcoords;
 }
@@ -30,19 +25,26 @@ void main(void) {
 const shader_basic_frag = `
 precision mediump float;
 uniform sampler2D u_texture;
+uniform highp vec3 playerLightPosition;
 varying highp vec2 vTexcoords;
 varying highp vec3 vNormal;
-varying highp vec3 vLight;
-varying highp vec3 vSurfaceToPlayerLight;
+varying highp vec3 vPosition;
+
+const vec3 AMBIENT_LIGHT = vec3(0.2, 0.2, 0.3);
+
 void main(void) {
   highp vec4 texelColor = texture2D(u_texture, vTexcoords);
 
   vec3 normal = normalize(vNormal);
-  vec3 surfaceToLightDirection = normalize(vSurfaceToPlayerLight);
 
-  float playerLight = 2. * dot(normal, surfaceToLightDirection);
+  vec3 surfaceToLightDirection = normalize(vPosition - vec3(playerLightPosition.x, -1., playerLightPosition.z));
+  float directional = max(dot(normal, surfaceToLightDirection), 0.0);
 
-  vec3 light = mix(vLight.xyz, vec3(playerLight, playerLight, playerLight), 0.9);
+  float playerLight = 2.3 - 2. * distance(vPosition, vec3(playerLightPosition.x, 0., playerLightPosition.z));
+
+  float totalLight = max(directional, playerLight);
+
+  vec3 light = AMBIENT_LIGHT + vec3(totalLight);
 
   gl_FragColor = vec4(texelColor.rgb * light, texelColor.a);;
 }

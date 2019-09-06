@@ -12,16 +12,18 @@ const Drawing = function(canvas) {
     const texcoords = []
     const indices = []
 
+    const topNormal = [0, 1, 0]
+
     const vertexMap = new Map()
-    const getVertex = (v, t, n = [0, 1, 0]) => {
-      const key = JSON.stringify([v, t, n])
+    const getVertex = (xyz, tex, normal = topNormal) => {
+      const key = JSON.stringify([xyz, tex, normal])
       let result = vertexMap.get(key)
       if (result === undefined) {
         result = vertexMap.size
         vertexMap.set(key, result)
-        vertices.push(-v[0] * scale, v[1] * scale, v[2] * scale)
-        texcoords.push(t[0] * scale * 4, t[1] * scale * 4)
-        normals.push(n[0], n[1], n[2])
+        vertices.push(-xyz[0] * scale, xyz[1] * scale, xyz[2] * scale)
+        texcoords.push(tex[0] * scale * 4, tex[1] * scale * 4)
+        normals.push(normal[0], normal[1], normal[2])
       }
       return result
     }
@@ -62,12 +64,11 @@ const Drawing = function(canvas) {
     }
 
     const makeQuad = (v0, v1, v2, v3) => {
-      const n = getTriangleNormal(v0[0], v1[0], v2[0])
-      const i0 = getVertex(...v0, n)
-      const i1 = getVertex(...v1, n)
-      const i2 = getVertex(...v2, n)
-      const i3 = getVertex(...v3, n)
-      indices.push(i2, i1, i0, i3, i1, i2)
+      const i0 = getVertex(...v0)
+      const i1 = getVertex(...v1)
+      const i2 = getVertex(...v2)
+      const i3 = getVertex(...v3)
+      indices.push(i0, i1, i3, i0, i3, i2)
     }
 
     for (const level of levels) {
@@ -88,57 +89,61 @@ const Drawing = function(canvas) {
             continue
           }
 
-          const width = 5
-          const topY = -10
-          const pillarY = -15
-          const bottomY = 1
-          const deepdown = 300
+          const xlen = a.x - b.x
+          const zlen = a.y - b.y
+
+          const nx = -zlen / segmentLength
+          const nz = xlen / segmentLength
 
           const perimeter1 = perimeter0 + segmentLength
 
-          const height = bottomY - topY
+          const verticalNormal = [nx, 0, -nz]
+          const invVerticalNormal = [-nx, 0, nz]
+
+          const width = 5
+          const topY = -10
+          const bottomY = 1
+          const deepdown = 300
 
           // deep down
           makeQuad(
-            [[a.x, bottomY, a.y], [perimeter0, bottomY]],
-            [[b.x, bottomY, b.y], [perimeter1, bottomY]],
-            [[a.x, deepdown, a.y], [perimeter0, deepdown]],
-            [[b.x, deepdown, b.y], [perimeter1, deepdown]]
+            [[a.x, bottomY, a.y], [perimeter0, bottomY], verticalNormal],
+            [[b.x, bottomY, b.y], [perimeter1, bottomY], verticalNormal],
+            [[a.x, deepdown, a.y], [perimeter0, deepdown], verticalNormal],
+            [[b.x, deepdown, b.y], [perimeter1, deepdown], verticalNormal]
           )
 
-          const offset = a
-            .sub(b)
-            .normal()
-            .mul(width / 2)
-
+          const offset = new Vec2(nx, nz).mul(width / 2)
           const border = [a.add(offset), b.add(offset), b.sub(offset), a.sub(offset)]
 
           // outer
           makeQuad(
-            [[border[1].x, bottomY, border[1].y], [perimeter0, bottomY]],
-            [[border[0].x, bottomY, border[0].y], [perimeter1, bottomY]],
-            [[border[1].x, topY, border[1].y], [perimeter0, topY]],
-            [[border[0].x, topY, border[0].y], [perimeter1, topY]]
+            [[border[1].x, bottomY, border[1].y], [perimeter0, bottomY], verticalNormal],
+            [[border[0].x, bottomY, border[0].y], [perimeter1, bottomY], verticalNormal],
+            [[border[1].x, topY, border[1].y], [perimeter0, topY], verticalNormal],
+            [[border[0].x, topY, border[0].y], [perimeter1, topY], verticalNormal]
           )
 
           // inner
           makeQuad(
-            [[border[3].x, bottomY, border[3].y], [perimeter0, bottomY]],
-            [[border[2].x, bottomY, border[2].y], [perimeter1, bottomY]],
-            [[border[3].x, topY, border[3].y], [perimeter0, topY]],
-            [[border[2].x, topY, border[2].y], [perimeter1, topY]]
+            [[border[3].x, bottomY, border[3].y], [perimeter0, bottomY], invVerticalNormal],
+            [[border[2].x, bottomY, border[2].y], [perimeter1, bottomY], invVerticalNormal],
+            [[border[3].x, topY, border[3].y], [perimeter0, topY], invVerticalNormal],
+            [[border[2].x, topY, border[2].y], [perimeter1, topY], invVerticalNormal]
           )
 
           // top
           makeQuad(
-            [[border[1].x, topY, border[1].y], [border[1].x, border[1].y]],
-            [[border[0].x, topY, border[0].y], [border[0].x, border[0].y]],
-            [[border[2].x, topY, border[2].y], [border[2].x, border[2].y]],
-            [[border[3].x, topY, border[3].y], [border[3].x, border[3].y]]
+            [[border[1].x, topY, border[1].y], [border[1].x, border[1].y], topNormal],
+            [[border[0].x, topY, border[0].y], [border[0].x, border[0].y], topNormal],
+            [[border[2].x, topY, border[2].y], [border[2].x, border[2].y], topNormal],
+            [[border[3].x, topY, border[3].y], [border[3].x, border[3].y], topNormal]
           )
 
           /*
  
+          const height = bottomY - topY
+          const pillarY = -15
 
           const quad2 = [
             a.add({ x: 7, y: 7 }), //front-right
@@ -162,9 +167,9 @@ const Drawing = function(canvas) {
         for (let i = 2; i < pts.length; ++i) {
           const c = pts[i]
           indices.push(
-            getVertex([a.x, 1, a.y], [a.x, a.y]),
+            getVertex([c.x, 1, c.y], [c.x, c.y]),
             getVertex([b.x, 1, b.y], [b.x, b.y]),
-            getVertex([c.x, 1, c.y], [c.x, c.y])
+            getVertex([a.x, 1, a.y], [a.x, a.y])
           )
           b = c
         }
@@ -244,7 +249,6 @@ const Drawing = function(canvas) {
     const camera = interpolate(position, movementVector)
 
     playerLightPosition[0] = -camera.x * scale
-    playerLightPosition[1] = -0.5
     playerLightPosition[2] = camera.y * scale
 
     cameraPos[0] = -camera.x * scale
@@ -290,12 +294,13 @@ const Drawing = function(canvas) {
     gl.bindTexture(gl.TEXTURE_2D, textures.t1)
 
     gl.enable(gl.CULL_FACE)
-    gl.cullFace(gl.FRONT)
+    gl.cullFace(gl.BACK)
 
     gl.useProgram(shaderProgram)
 
     gl.uniformMatrix4fv(uPmatrix, false, projectionMatrix)
     gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
+    gl.uniform3fv(uPlayerLightPosition, playerLightPosition)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
     gl.vertexAttribPointer(uPosition, 3, gl.FLOAT, false, 0, 0)
@@ -312,8 +317,6 @@ const Drawing = function(canvas) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer)
 
     gl.drawElements(gl.TRIANGLES, level.indexBufferLength, gl.UNSIGNED_SHORT, level.indexBufferOffset * 2)
-
-    gl.uniform3fv(uPlayerLightPosition, playerLightPosition)
   }
 
   this.titleScreen = () => {}

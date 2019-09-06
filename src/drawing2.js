@@ -97,8 +97,8 @@ const Drawing = function(canvas) {
 
           const perimeter1 = perimeter0 + segmentLength
 
-          const verticalNormal = [nx, 0, -nz]
-          const invVerticalNormal = [-nx, 0, nz]
+          const verticalNormal = [-nx, 0, nz]
+          const invVerticalNormal = [nx, 0, -nz]
 
           const width = 5
           const topY = -10
@@ -118,18 +118,18 @@ const Drawing = function(canvas) {
 
           // outer
           makeQuad(
-            [[border[1].x, bottomY, border[1].y], [perimeter0, bottomY], verticalNormal],
-            [[border[0].x, bottomY, border[0].y], [perimeter1, bottomY], verticalNormal],
-            [[border[1].x, topY, border[1].y], [perimeter0, topY], verticalNormal],
-            [[border[0].x, topY, border[0].y], [perimeter1, topY], verticalNormal]
+            [[border[1].x, bottomY, border[1].y], [perimeter0, bottomY], invVerticalNormal],
+            [[border[0].x, bottomY, border[0].y], [perimeter1, bottomY], invVerticalNormal],
+            [[border[1].x, topY, border[1].y], [perimeter0, topY], invVerticalNormal],
+            [[border[0].x, topY, border[0].y], [perimeter1, topY], invVerticalNormal]
           )
 
           // inner
           makeQuad(
-            [[border[3].x, bottomY, border[3].y], [perimeter0, bottomY], invVerticalNormal],
-            [[border[2].x, bottomY, border[2].y], [perimeter1, bottomY], invVerticalNormal],
-            [[border[3].x, topY, border[3].y], [perimeter0, topY], invVerticalNormal],
-            [[border[2].x, topY, border[2].y], [perimeter1, topY], invVerticalNormal]
+            [[border[3].x, bottomY, border[3].y], [perimeter0, bottomY], verticalNormal],
+            [[border[2].x, bottomY, border[2].y], [perimeter1, bottomY], verticalNormal],
+            [[border[3].x, topY, border[3].y], [perimeter0, topY], verticalNormal],
+            [[border[2].x, topY, border[2].y], [perimeter1, topY], verticalNormal]
           )
 
           // top

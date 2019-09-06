@@ -63,12 +63,41 @@ const Drawing = function(canvas) {
       indices.push(p0, p3, p1, p0, p2, p3)
     }
 
+    const makeTriangle = (v0, v1, v2) => {
+      const U = Vec3.sub(v1, v0)
+      const V = Vec3.sub(v2, v0)
+      const normal = Vec3.cross(U, V)
+      indices.push(
+        getVertex(v0, [v0[0], v0[1]], normal),
+        getVertex(v1, [v1[0], v1[1]], normal),
+        getVertex(v2, [v2[0], v2[1]], normal),
+      );
+    }
+
     const makeQuad = (v0, v1, v2, v3) => {
       const i0 = getVertex(...v0)
       const i1 = getVertex(...v1)
       const i2 = getVertex(...v2)
       const i3 = getVertex(...v3)
       indices.push(i0, i1, i3, i0, i3, i2)
+    }
+
+    const makeQuad2 = (v0, v1, v2, v3) => {
+      makeTriangle(v0, v1, v3)
+      makeTriangle(v1, v2, v3)
+    }
+
+    //b and t are each 4 vertexes, anticlockwise for bottom and top of the shape
+    const makeFrustrum = (b, t, fillBottom = false) => {
+      const offset = indices.length;
+      if (fillBottom) makeQuad2(...b)
+      makeQuad2(...t);
+      makeQuad2(b[0], b[1], t[1], t[0]);
+      makeQuad2(b[0], t[0], t[3], b[3]);
+      makeQuad2(b[3], t[3], t[2], b[2]);
+      makeQuad2(b[2], t[2], t[1], b[1]);
+      const length = indices.length - offset
+      return [offset, length]
     }
 
     for (const level of levels) {
@@ -175,8 +204,33 @@ const Drawing = function(canvas) {
         }
       }
 
+
+
+
       level.indexBufferOffset = indexBufferOffset
       level.indexBufferLength = indices.length - indexBufferOffset
+
+
+      const switchSize = 25;
+      const switchTop = -2
+      for (const s of level.switches) {
+        const p = new Vec2(s.x, s.y);
+        const bottom = [
+          [s.x + switchSize, 1, s.y + switchSize],
+          [s.x + switchSize, 1, s.y - switchSize],
+          [s.x - switchSize, 1, s.y - switchSize],
+          [s.x - switchSize, 1, s.y + switchSize],
+        ];
+        const top = [
+          [s.x + switchSize, switchTop, s.y + switchSize],
+          [s.x + switchSize, switchTop, s.y - switchSize],
+          [s.x - switchSize, switchTop, s.y - switchSize],
+          [s.x - switchSize, switchTop, s.y + switchSize],
+        ]
+        const [o, l] = makeFrustrum(bottom, top);
+        s.indexBufferOffset = o
+        s.indexBufferLength = l
+      }
     }
 
     return {
@@ -317,6 +371,18 @@ const Drawing = function(canvas) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer)
 
     gl.drawElements(gl.TRIANGLES, level.indexBufferLength, gl.UNSIGNED_SHORT, level.indexBufferOffset * 2)
+
+    for (s of level.switches) {
+      if (s.pressed) {
+        mat4.translate(viewMatrix, viewMatrix, [0, 2 * scale, 0])
+        gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
+      }
+      gl.drawElements(gl.TRIANGLES, s.indexBufferLength, gl.UNSIGNED_SHORT, s.indexBufferOffset * 2)
+      if (s.pressed) {
+        mat4.translate(viewMatrix, viewMatrix, [0, -2 * scale, 0])
+        gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
+      }
+    }
   }
 
   this.titleScreen = () => {}

@@ -24,6 +24,9 @@ function mergeScriptFiles(filenames) {
   const result = []
 
   for (const filename of filenames) {
+    if (filename.startsWith('http:') || filename.startsWith('https:')) {
+      continue
+    }
     const filepath = path.resolve(srcFolder, filename)
     const js = fs.readFileSync(filepath, 'utf8')
     result.push(js)

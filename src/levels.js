@@ -24,11 +24,16 @@ const levels = [
         { x: 576, y: 288 },
         { x: 480, y: 288 }
       ],
-      [{ x: 416, y: 768 }, { x: 416, y: 288 }, { x: 480, y: 288 }, { x: 480, y: 768 }]
+      [
+        { x: 416, y: 768 },
+        { x: 416, y: 288 },
+        { x: 480, y: 288 },
+        { x: 480, y: 768 }
+      ]
     ],
     doors: [
       {
-        name: 'door1',
+        name: "door1",
         polygon: [{ x: 416, y: 288 }, { x: 480, y: 288 }, { x: 416, y: 288 }],
         open: false
       }
@@ -37,9 +42,9 @@ const levels = [
       {
         x: 448,
         y: 480,
-        name: 'switch1',
-        targets: ['door1'],
-        type: 'momentary',
+        name: "switch1",
+        targets: ["door1"],
+        type: "momentary",
         pressed: 0
       }
     ],
@@ -56,9 +61,9 @@ const levels = [
         { x: 416, y: 832 },
         { x: 448, y: 832 },
         { x: 448, y: 768 },
-        { x: 320, y: 768 },
+        { x: 320, y: 704 },
         { x: 320, y: 576 },
-        { x: 448, y: 576 },
+        { x: 448, y: 480 },
         { x: 448, y: 352 },
         { x: 416, y: 352 },
         { x: 416, y: 224 },
@@ -75,10 +80,8 @@ const levels = [
         { x: 576, y: 608 },
         { x: 672, y: 608 },
         { x: 672, y: 544 },
-        { x: 512, y: 544 },
-        { x: 512, y: 640 },
-        { x: 384, y: 640 },
-        { x: 384, y: 704 },
+        { x: 544, y: 544 },
+        { x: 416, y: 640 },
         { x: 512, y: 704 },
         { x: 512, y: 896 },
         { x: 416, y: 896 },
@@ -96,6 +99,12 @@ const levels = [
         { x: 512, y: 352 }
       ],
       [
+        { x: 448, y: 480 },
+        { x: 448, y: 352 },
+        { x: 512, y: 352 },
+        { x: 512, y: 480 }
+      ],
+      [
         { x: 736, y: 608 },
         { x: 832, y: 608 },
         { x: 832, y: 736 },
@@ -111,25 +120,59 @@ const levels = [
         { x: 416, y: 800 },
         { x: 416, y: 832 }
       ],
-      [{ x: 512, y: 896 }, { x: 416, y: 896 }, { x: 416, y: 832 }, { x: 448, y: 832 }],
-      [{ x: 512, y: 704 }, { x: 512, y: 896 }, { x: 448, y: 832 }, { x: 448, y: 768 }],
-      [{ x: 384, y: 704 }, { x: 512, y: 704 }, { x: 448, y: 768 }, { x: 320, y: 768 }],
-      [{ x: 384, y: 640 }, { x: 384, y: 704 }, { x: 320, y: 768 }, { x: 320, y: 576 }],
-      [{ x: 384, y: 640 }, { x: 320, y: 576 }, { x: 448, y: 576 }],
-      [{ x: 672, y: 544 }, { x: 512, y: 544 }, { x: 512, y: 480 }, { x: 736, y: 480 }],
-      [{ x: 736, y: 480 }, { x: 736, y: 608 }, { x: 672, y: 608 }, { x: 672, y: 544 }],
-      [{ x: 512, y: 480 }, { x: 512, y: 544 }, { x: 448, y: 576 }, { x: 448, y: 352 }, { x: 512, y: 352 }],
-      [{ x: 384, y: 640 }, { x: 448, y: 576 }, { x: 512, y: 544 }, { x: 512, y: 640 }]
+      [
+        { x: 512, y: 896 },
+        { x: 416, y: 896 },
+        { x: 416, y: 832 },
+        { x: 448, y: 832 }
+      ],
+      [{ x: 512, y: 896 }, { x: 448, y: 832 }, { x: 448, y: 768 }],
+      [
+        { x: 544, y: 544 },
+        { x: 416, y: 640 },
+        { x: 320, y: 576 },
+        { x: 448, y: 480 },
+        { x: 512, y: 480 }
+      ],
+      [
+        { x: 672, y: 544 },
+        { x: 544, y: 544 },
+        { x: 512, y: 480 },
+        { x: 736, y: 480 }
+      ],
+      [
+        { x: 736, y: 480 },
+        { x: 736, y: 608 },
+        { x: 672, y: 608 },
+        { x: 672, y: 544 }
+      ],
+      [
+        { x: 320, y: 576 },
+        { x: 416, y: 640 },
+        { x: 448, y: 768 },
+        { x: 320, y: 704 }
+      ],
+      [
+        { x: 512, y: 896 },
+        { x: 448, y: 768 },
+        { x: 416, y: 640 },
+        { x: 512, y: 704 }
+      ]
     ],
     doors: [
       {
-        name: 'door2',
+        name: "door2",
         polygon: [{ x: 448, y: 352 }, { x: 512, y: 352 }, { x: 448, y: 352 }],
         open: false
       },
       {
-        name: 'door1',
-        polygon: [{ x: 448, y: 416 }, { x: 448, y: 416 }, { x: 512, y: 416 }, { x: 448, y: 416 }],
+        name: "door1",
+        polygon: [
+          { x: 448, y: 416 },
+          { x: 448, y: 416 },
+          { x: 512, y: 416 },
+          { x: 448, y: 416 }
+        ],
         open: false
       }
     ],
@@ -137,17 +180,17 @@ const levels = [
       {
         x: 768,
         y: 672,
-        name: 'switch1',
-        targets: ['door1'],
-        type: 'momentary',
+        name: "switch1",
+        targets: ["door1"],
+        type: "momentary",
         pressed: 0
       },
       {
         x: 640,
         y: 672,
-        name: 'switch2',
-        targets: ['door2'],
-        type: 'momentary',
+        name: "switch2",
+        targets: ["door2"],
+        type: "momentary",
         pressed: 0
       }
     ],
@@ -190,10 +233,30 @@ const levels = [
         { x: 640, y: 352 },
         { x: 512, y: 352 }
       ],
-      [{ x: 448, y: 672 }, { x: 448, y: 352 }, { x: 512, y: 352 }, { x: 512, y: 672 }],
-      [{ x: 512, y: 736 }, { x: 512, y: 960 }, { x: 448, y: 960 }, { x: 448, y: 736 }],
-      [{ x: 192, y: 640 }, { x: 192, y: 672 }, { x: 128, y: 736 }, { x: 128, y: 384 }],
-      [{ x: 128, y: 384 }, { x: 416, y: 384 }, { x: 416, y: 640 }, { x: 192, y: 640 }],
+      [
+        { x: 448, y: 672 },
+        { x: 448, y: 352 },
+        { x: 512, y: 352 },
+        { x: 512, y: 672 }
+      ],
+      [
+        { x: 512, y: 736 },
+        { x: 512, y: 960 },
+        { x: 448, y: 960 },
+        { x: 448, y: 736 }
+      ],
+      [
+        { x: 192, y: 640 },
+        { x: 192, y: 672 },
+        { x: 128, y: 736 },
+        { x: 128, y: 384 }
+      ],
+      [
+        { x: 128, y: 384 },
+        { x: 416, y: 384 },
+        { x: 416, y: 640 },
+        { x: 192, y: 640 }
+      ],
       [
         { x: 512, y: 736 },
         { x: 448, y: 736 },
@@ -207,12 +270,12 @@ const levels = [
     ],
     doors: [
       {
-        name: 'door2',
+        name: "door2",
         polygon: [{ x: 448, y: 352 }, { x: 512, y: 352 }, { x: 448, y: 352 }],
         open: false
       },
       {
-        name: 'door1',
+        name: "door1",
         polygon: [{ x: 448, y: 672 }, { x: 448, y: 736 }, { x: 448, y: 672 }],
         open: false
       }
@@ -221,17 +284,17 @@ const levels = [
       {
         x: 352,
         y: 512,
-        name: 'switch',
-        targets: ['door2'],
-        type: 'momentary',
+        name: "switch",
+        targets: ["door2"],
+        type: "momentary",
         pressed: 0
       },
       {
         x: 769,
         y: 702,
-        name: 'switch1',
-        targets: ['door1'],
-        type: 'toggle',
+        name: "switch1",
+        targets: ["door1"],
+        type: "toggle",
         pressed: 0
       }
     ],
@@ -272,12 +335,42 @@ const levels = [
       ]
     ],
     polys: [
-      [{ x: 320, y: 672 }, { x: 384, y: 672 }, { x: 384, y: 800 }, { x: 256, y: 800 }],
-      [{ x: 320, y: 288 }, { x: 320, y: 672 }, { x: 256, y: 800 }, { x: 256, y: 224 }],
-      [{ x: 416, y: 288 }, { x: 320, y: 288 }, { x: 256, y: 224 }, { x: 416, y: 224 }],
-      [{ x: 192, y: 832 }, { x: 384, y: 832 }, { x: 384, y: 960 }, { x: 128, y: 960 }],
-      [{ x: 192, y: 96 }, { x: 192, y: 832 }, { x: 128, y: 960 }, { x: 128, y: 32 }],
-      [{ x: 416, y: 96 }, { x: 192, y: 96 }, { x: 128, y: 32 }, { x: 480, y: 32 }],
+      [
+        { x: 320, y: 672 },
+        { x: 384, y: 672 },
+        { x: 384, y: 800 },
+        { x: 256, y: 800 }
+      ],
+      [
+        { x: 320, y: 288 },
+        { x: 320, y: 672 },
+        { x: 256, y: 800 },
+        { x: 256, y: 224 }
+      ],
+      [
+        { x: 416, y: 288 },
+        { x: 320, y: 288 },
+        { x: 256, y: 224 },
+        { x: 416, y: 224 }
+      ],
+      [
+        { x: 192, y: 832 },
+        { x: 384, y: 832 },
+        { x: 384, y: 960 },
+        { x: 128, y: 960 }
+      ],
+      [
+        { x: 192, y: 96 },
+        { x: 192, y: 832 },
+        { x: 128, y: 960 },
+        { x: 128, y: 32 }
+      ],
+      [
+        { x: 416, y: 96 },
+        { x: 192, y: 96 },
+        { x: 128, y: 32 },
+        { x: 480, y: 32 }
+      ],
       [
         { x: 480, y: 288 },
         { x: 480, y: 960 },
@@ -288,23 +381,38 @@ const levels = [
         { x: 480, y: 32 },
         { x: 480, y: 224 }
       ],
-      [{ x: 576, y: 288 }, { x: 480, y: 288 }, { x: 480, y: 224 }, { x: 640, y: 224 }],
-      [{ x: 576, y: 672 }, { x: 576, y: 288 }, { x: 640, y: 224 }, { x: 640, y: 800 }],
-      [{ x: 640, y: 800 }, { x: 512, y: 800 }, { x: 512, y: 672 }, { x: 576, y: 672 }]
+      [
+        { x: 576, y: 288 },
+        { x: 480, y: 288 },
+        { x: 480, y: 224 },
+        { x: 640, y: 224 }
+      ],
+      [
+        { x: 576, y: 672 },
+        { x: 576, y: 288 },
+        { x: 640, y: 224 },
+        { x: 640, y: 800 }
+      ],
+      [
+        { x: 640, y: 800 },
+        { x: 512, y: 800 },
+        { x: 512, y: 672 },
+        { x: 576, y: 672 }
+      ]
     ],
     doors: [
       {
-        name: 'door1',
+        name: "door1",
         polygon: [{ x: 416, y: 416 }, { x: 480, y: 416 }, { x: 416, y: 416 }],
         open: false
       },
       {
-        name: 'door1',
+        name: "door1",
         polygon: [{ x: 416, y: 512 }, { x: 480, y: 512 }, { x: 416, y: 512 }],
         open: false
       },
       {
-        name: 'door1',
+        name: "door1",
         polygon: [{ x: 576, y: 576 }, { x: 640, y: 576 }, { x: 576, y: 576 }],
         open: false
       }
@@ -313,25 +421,25 @@ const levels = [
       {
         x: 448,
         y: 480,
-        name: 'switch1',
-        targets: ['door1'],
-        type: 'momentary',
+        name: "switch1",
+        targets: ["door1"],
+        type: "momentary",
         pressed: 0
       },
       {
         x: 320,
         y: 736,
-        name: 'switch1',
-        targets: ['door1'],
-        type: 'momentary',
+        name: "switch1",
+        targets: ["door1"],
+        type: "momentary",
         pressed: 0
       },
       {
         x: 448,
         y: 576,
-        name: 'switch1',
-        targets: ['door1'],
-        type: 'momentary',
+        name: "switch1",
+        targets: ["door1"],
+        type: "momentary",
         pressed: 0
       }
     ],
@@ -358,8 +466,18 @@ const levels = [
       ]
     ],
     polys: [
-      [{ x: 416, y: 672 }, { x: 320, y: 672 }, { x: 320, y: 608 }, { x: 416, y: 608 }],
-      [{ x: 480, y: 608 }, { x: 576, y: 608 }, { x: 576, y: 672 }, { x: 480, y: 672 }],
+      [
+        { x: 416, y: 672 },
+        { x: 320, y: 672 },
+        { x: 320, y: 608 },
+        { x: 416, y: 608 }
+      ],
+      [
+        { x: 480, y: 608 },
+        { x: 576, y: 608 },
+        { x: 576, y: 672 },
+        { x: 480, y: 672 }
+      ],
       [
         { x: 416, y: 832 },
         { x: 416, y: 672 },
@@ -373,22 +491,22 @@ const levels = [
     ],
     doors: [
       {
-        name: 'door1',
+        name: "door1",
         polygon: [{ x: 416, y: 608 }, { x: 480, y: 608 }, { x: 416, y: 608 }],
         open: false
       },
       {
-        name: 'door2',
+        name: "door2",
         polygon: [{ x: 416, y: 544 }, { x: 480, y: 544 }, { x: 416, y: 544 }],
         open: false
       },
       {
-        name: 'door3',
+        name: "door3",
         polygon: [{ x: 416, y: 480 }, { x: 480, y: 480 }, { x: 416, y: 480 }],
         open: false
       },
       {
-        name: 'door4',
+        name: "door4",
         polygon: [{ x: 416, y: 416 }, { x: 480, y: 416 }, { x: 416, y: 416 }],
         open: false
       }
@@ -397,37 +515,37 @@ const levels = [
       {
         x: 352,
         y: 640,
-        name: 'switch1',
-        targets: ['door1', 'door3'],
-        type: 'momentary',
+        name: "switch1",
+        targets: ["door1", "door3"],
+        type: "momentary",
         pressed: 0
       },
       {
         x: 416,
         y: 640,
-        name: 'switch2',
-        targets: ['door3', 'door4'],
-        type: 'momentary',
+        name: "switch2",
+        targets: ["door3", "door4"],
+        type: "momentary",
         pressed: 0
       },
       {
         x: 480,
         y: 640,
-        name: 'switch3',
-        targets: ['door1', 'door2'],
-        type: 'momentary',
+        name: "switch3",
+        targets: ["door1", "door2"],
+        type: "momentary",
         pressed: 0
       },
       {
         x: 544,
         y: 640,
-        name: 'switch4',
-        targets: ['door2', 'door3'],
-        type: 'momentary',
+        name: "switch4",
+        targets: ["door2", "door3"],
+        type: "momentary",
         pressed: 0
       }
     ],
     start: { x: 448, y: 800 },
     end: { x: 448, y: 352 }
   }
-]
+];

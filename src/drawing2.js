@@ -8,50 +8,70 @@ const Drawing = function(canvas) {
 
   function build() {
     const vertices = []
+    const normals = []
     const texcoords = []
     const indices = []
 
     const vertexMap = new Map()
-    const getVertex = (x, y, z, type = 0) => {
-      let tx
-      let ty
-      if (type === 0 || type === 1) {
-        tx = x
-        ty = z
-      } else if (type === 2) {
-        tx = x
-        ty = y + z
-      } else {
-        tx = x
-        ty = y + z
-      }
-      tx *= scale * 4
-      ty *= scale * 4
-      const key = JSON.stringify([x, y, z, tx, ty])
+    const getVertex = (v, t, n = [0, 1, 0]) => {
+      const key = JSON.stringify([v, t, n])
       let result = vertexMap.get(key)
       if (result === undefined) {
         result = vertexMap.size
         vertexMap.set(key, result)
-        vertices.push(-x * scale, y * scale, z * scale)
-        texcoords.push(tx, ty)
+        vertices.push(-v[0] * scale, v[1] * scale, v[2] * scale)
+        texcoords.push(t[0] * scale * 4, t[1] * scale * 4)
+        normals.push(n[0], n[1], n[2])
       }
       return result
     }
 
-    const makeWallQuad = (x1, y1, z1, x2, y2, z2, type) => {
-      const p0 = getVertex(x1, y1, z1, type)
-      const p1 = getVertex(x2, y1, z2, type)
-      const p2 = getVertex(x1, y2, z1, type)
-      const p3 = getVertex(x2, y2, z2, type)
+    const getTriangleNormal = (v0, v1, v2) => {
+      const ux = v1[0] - v0[0]
+      const uy = v1[1] - v0[1]
+      const uz = v1[2] - v0[2]
+
+      const vx = v2[0] - v0[0]
+      const vy = v2[1] - v0[1]
+      const vz = v2[2] - v0[2]
+
+      const nx = uy * vz - uz * vy
+      const ny = uz * vx - ux * vz
+      const nz = ux * vy - uy * vx
+
+      const len2 = nx * nx + ny * ny + nz * nz
+      if (len2 <= 0.00000001) {
+        return [0, 1, 0]
+      }
+
+      const len = 1 / Math.sqrt(len2)
+      return [nx * len, ny * len, nz * len]
+    }
+
+    const makeWallQuad = (aX, aY, aZ, bX, bY, bZ, tshift, segmentLength) => {
+      const h = bY - aY
+      const p0 = getVertex([aX, aY, aZ], [tshift, 0])
+      const p1 = getVertex([bX, aY, bZ], [tshift + segmentLength, 0])
+      const p2 = getVertex([aX, bY, aZ], [tshift, h])
+      const p3 = getVertex([bX, bY, bZ], [tshift + segmentLength, h])
       indices.push(p0, p3, p1, p0, p2, p3)
     }
 
-    const makeFloorQuad = (aX, aY, aZ, bX, bY, bZ, type) => {
-      const p0 = getVertex(aX, aY, aZ, type)
-      const p1 = getVertex(aX, bY, bZ, type)
-      const p2 = getVertex(bX, aY, aZ, type)
-      const p3 = getVertex(bX, bY, bZ, type)
+    const makeFloorQuad = (aX, aY, aZ, bX, bY, bZ) => {
+      const p0 = getVertex([aX, aY, aZ], [aX, aZ])
+      const p1 = getVertex([aX, bY, bZ], [aX, bZ])
+      const p2 = getVertex([bX, aY, aZ], [bX, aZ])
+      const p3 = getVertex([bX, bY, bZ], [bX, bZ])
       indices.push(p0, p3, p1, p0, p2, p3)
+    }
+
+    const makeQuad = (v0, v1, v2, v3) => {
+      const n = getTriangleNormal(v0[0], v3[0], v1[0])
+      const i0 = getVertex(...v0, n)
+      const i1 = getVertex(...v1, n)
+      const i2 = getVertex(...v2, n)
+      const i3 = getVertex(...v3, n)
+      indices.push(i0, i3, i1, i0, i2, i3)
     }
 
     for (const level of levels) {
@@ -59,46 +79,100 @@ const Drawing = function(canvas) {
 
       const walls = level.walls
       for (const poly of walls) {
+        let perimeter0 = 0
         for (let i = 0; i < poly.length; ++i) {
           const a = new Vec2(poly[i].x, poly[i].y)
           const bb = poly[(i + 1) % poly.length]
           const b = new Vec2(bb.x, bb.y)
-          makeWallQuad(a.x, 1, a.y, b.x, 100, b.y, 3)
 
-          const normal = a.sub(b).normal()
+          //polyWallPerimeter += makeWallQuad(a.x, 1, a.y, b.x, 100, b.y, 3, polyWallPerimeter)
+
           const width = 5
           const topY = -10
+          const pillarY = -15
           const bottomY = 1
-          const quad = [
-            a.add(normal.mul(width / 2)),
-            b.add(normal.mul(width / 2)),
-            b.sub(normal.mul(width / 2)),
-            a.sub(normal.mul(width / 2))
-          ]
-          makeWallQuad(quad[0].x, bottomY, quad[0].y, quad[1].x, topY, quad[1].y, 2)
-          makeFloorQuad(quad[2].x, topY, quad[2].y, quad[0].x, topY, quad[0].y, 1) //top
-          makeWallQuad(quad[2].x, bottomY, quad[2].y, quad[3].x, topY, quad[3].y, 2)
+          const deepdown = 100
+
+          const segmentLength = Math.hypot(b.x - a.x, b.y - a.y)
+          const perimeter1 = perimeter0 + segmentLength
+
+          const height = bottomY - topY
+
+          // deep down
+          makeQuad(
+            [[a.x, bottomY, a.y], [perimeter0, bottomY]],
+            [[b.x, bottomY, b.y], [perimeter1, bottomY]],
+            [[a.x, deepdown, a.y], [perimeter0, deepdown]],
+            [[b.x, deepdown, b.y], [perimeter1, deepdown]]
+          )
+
+          const offset = a
+            .sub(b)
+            .normal()
+            .mul(width / 2)
+
+          const border = [a.add(offset), b.add(offset), b.sub(offset), a.sub(offset)]
+
+          // outer
+          makeQuad(
+            [[border[1].x, bottomY, border[1].y], [perimeter0, bottomY]],
+            [[border[0].x, bottomY, border[0].y], [perimeter1, bottomY]],
+            [[border[1].x, topY, border[1].y], [perimeter0, topY]],
+            [[border[0].x, topY, border[0].y], [perimeter1, topY]]
+          )
+
+          // inner
+          makeQuad(
+            [[border[3].x, bottomY, border[3].y], [perimeter0, bottomY]],
+            [[border[2].x, bottomY, border[2].y], [perimeter1, bottomY]],
+            [[border[3].x, topY, border[3].y], [perimeter0, topY]],
+            [[border[2].x, topY, border[2].y], [perimeter1, topY]]
+          )
+
+          // top
+          makeQuad(
+            [[border[0].x, topY, border[0].y], [border[0].x, border[0].y]],
+            [[border[1].x, topY, border[1].y], [border[1].x, border[1].y]],
+            [[border[3].x, topY, border[3].y], [border[3].x, border[3].y]],
+            [[border[2].x, topY, border[2].y], [border[2].x, border[2].y]]
+          )
+          /*
+          makeQuad(
+            [[quad[0].x, topY, quad[0].y], [quad[0].x, quad[0].y]],
+            [[quad[1].x, topY, quad[1].y], [quad[1].x, quad[1].y]],
+            [[quad[3].x, topY, quad[3].y], [quad[3].x, quad[3].y]],
+            [[quad[2].x, topY, quad[2].y], [quad[2].x, quad[2].y]]
+          )
+          */
+
+          /*
           const quad2 = [
             a.add({ x: 7, y: 7 }), //front-right
             a.add({ x: 7, y: -7 }), //back-right
             a.add({ x: -7, y: -7 }), //back-left
             a.add({ x: -7, y: 7 }) //front-left
           ]
-          makeWallQuad(quad2[0].x, bottomY, quad2[0].y, quad2[3].x, topY, quad2[3].y, 2) //front
-          makeWallQuad(quad2[2].x, bottomY, quad2[2].y, quad2[3].x, topY, quad2[3].y, 2) //left
-          makeFloorQuad(quad2[3].x, topY, quad2[3].y, quad2[1].x, topY, quad2[1].y, 1) //top
-          makeWallQuad(quad2[0].x, bottomY, quad2[0].y, quad2[1].x, topY, quad2[1].y, 2) //right
-          makeWallQuad(quad2[1].x, bottomY, quad2[1].y, quad2[2].x, topY, quad2[2].y, 2) //back
+          makeWallQuad(quad2[0].x, deepdown, quad2[0].y, quad2[3].x, pillarY, quad2[3].y, 2) //front
+          makeWallQuad(quad2[2].x, deepdown, quad2[2].y, quad2[3].x, pillarY, quad2[3].y, 2) //left
+          makeFloorQuad(quad2[3].x, pillarY, quad2[3].y, quad2[1].x, pillarY, quad2[1].y, 1) //top
+          makeWallQuad(quad2[0].x, deepdown, quad2[0].y, quad2[1].x, pillarY, quad2[1].y, 2) //right
+          makeWallQuad(quad2[1].x, deepdown, quad2[1].y, quad2[2].x, pillarY, quad2[2].y, 2) //back
+          */
+          perimeter0 = perimeter1
         }
       }
 
       for (const pts of level.polys) {
-        const p0 = pts[0]
-        let pHelper = pts[1]
+        const a = pts[0]
+        let b = pts[1]
         for (let i = 2; i < pts.length; ++i) {
-          const pTemp = pts[i]
-          indices.push(getVertex(p0.x, 1, p0.y), getVertex(pHelper.x, 1, pHelper.y), getVertex(pTemp.x, 1, pTemp.y))
-          pHelper = pTemp
+          const c = pts[i]
+          indices.push(
+            getVertex([a.x, 1, a.y], [a.x, a.y]),
+            getVertex([b.x, 1, b.y], [b.x, b.y]),
+            getVertex([c.x, 1, c.y], [c.x, c.y])
+          )
+          b = c
         }
       }
 
@@ -108,6 +182,7 @@ const Drawing = function(canvas) {
 
     return {
       vertices: new Float32Array(vertices),
+      normals: new Float32Array(normals),
       texcoords: new Float32Array(texcoords),
       indices: new Uint16Array(indices)
     }
@@ -115,20 +190,17 @@ const Drawing = function(canvas) {
 
   const built = build()
 
-  // Create and store data into vertex buffer
-  const vertex_buffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
-  gl.bufferData(gl.ARRAY_BUFFER, built.vertices, gl.STATIC_DRAW)
+  const createGlBuffer = (items, type = gl.ARRAY_BUFFER) => {
+    const result = gl.createBuffer()
+    gl.bindBuffer(type, result)
+    gl.bufferData(type, items, gl.STATIC_DRAW)
+    return result
+  }
 
-  // Create and store data into texture coords buffer
-  const texcoords_buffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, texcoords_buffer)
-  gl.bufferData(gl.ARRAY_BUFFER, built.texcoords, gl.STATIC_DRAW)
-
-  // Create and store data into index buffer
-  const index_buffer = gl.createBuffer()
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer)
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, built.indices, gl.STATIC_DRAW)
+  const vertex_buffer = createGlBuffer(built.vertices)
+  const normal_buffer = createGlBuffer(built.normals)
+  const texcoords_buffer = createGlBuffer(built.texcoords)
+  const index_buffer = createGlBuffer(built.indices, gl.ELEMENT_ARRAY_BUFFER)
 
   const canvasWidth = canvas.clientWidth
   const canvasHeight = canvas.clientHeight
@@ -140,18 +212,16 @@ const Drawing = function(canvas) {
   const projectionMatrix = new Float32Array(16)
   calcProjectionMatrix()
 
-  const vertShader = gl.createShader(gl.VERTEX_SHADER)
-  gl.shaderSource(vertShader, shader_basic_vert)
-
-  const fragShader = gl.createShader(gl.FRAGMENT_SHADER)
-  gl.shaderSource(fragShader, shader_basic_frag)
-
-  gl.compileShader(fragShader)
-  gl.compileShader(vertShader)
+  const createGlShasder = (program, input, type) => {
+    const shader = gl.createShader(type)
+    gl.shaderSource(shader, input)
+    gl.compileShader(shader)
+    gl.attachShader(program, shader)
+  }
 
   const shaderProgram = gl.createProgram()
-  gl.attachShader(shaderProgram, vertShader)
-  gl.attachShader(shaderProgram, fragShader)
+  createGlShasder(shaderProgram, shader_basic_vert, gl.VERTEX_SHADER)
+  createGlShasder(shaderProgram, shader_basic_frag, gl.FRAGMENT_SHADER)
   gl.linkProgram(shaderProgram)
 
   if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
@@ -162,9 +232,8 @@ const Drawing = function(canvas) {
   const Pmatrix = gl.getUniformLocation(shaderProgram, 'Pmatrix')
   const Vmatrix = gl.getUniformLocation(shaderProgram, 'Vmatrix')
   const position = gl.getAttribLocation(shaderProgram, 'position')
+  const normal = gl.getAttribLocation(shaderProgram, 'normal')
   const texcoords = gl.getAttribLocation(shaderProgram, 'texcoords')
-
-  //const cubeRenderer = makeCubeRenderer(gl, position, color)
 
   this.scale = 1.5
 
@@ -186,7 +255,7 @@ const Drawing = function(canvas) {
 
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
-    gl.clearColor(0.5, 0.5, 0.5, 0.9)
+    gl.clearColor(0.5, 0.5, 0.5, 1)
     gl.clearDepth(1.0)
 
     gl.viewport(0.0, 0.0, canvasWidth, canvasHeight)
@@ -222,11 +291,14 @@ const Drawing = function(canvas) {
 
     gl.uniformMatrix4fv(Pmatrix, false, projectionMatrix)
     gl.uniformMatrix4fv(Vmatrix, false, viewMatrix)
-    //cubeRenderer()
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
     gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(position)
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, normal_buffer)
+    gl.vertexAttribPointer(normal, 3, gl.FLOAT, true, 0, 0)
+    gl.enableVertexAttribArray(normal)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, texcoords_buffer)
     gl.vertexAttribPointer(texcoords, 2, gl.FLOAT, false, 0, 0)

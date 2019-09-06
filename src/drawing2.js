@@ -107,10 +107,10 @@ const Drawing = function(canvas) {
 
           // deep down
           makeQuad(
-            [[a.x, bottomY, a.y], [perimeter0, bottomY], verticalNormal],
-            [[b.x, bottomY, b.y], [perimeter1, bottomY], verticalNormal],
-            [[a.x, deepdown, a.y], [perimeter0, deepdown], verticalNormal],
-            [[b.x, deepdown, b.y], [perimeter1, deepdown], verticalNormal]
+            [[b.x, bottomY, b.y], [perimeter0, bottomY], verticalNormal],
+            [[a.x, bottomY, a.y], [perimeter1, bottomY], verticalNormal],
+            [[b.x, deepdown, b.y], [perimeter0, deepdown], verticalNormal],
+            [[a.x, deepdown, a.y], [perimeter1, deepdown], verticalNormal]
           )
 
           const offset = new Vec2(nx, nz).mul(width / 2)
@@ -167,9 +167,9 @@ const Drawing = function(canvas) {
         for (let i = 2; i < pts.length; ++i) {
           const c = pts[i]
           indices.push(
-            getVertex([c.x, 1, c.y], [c.x, c.y]),
+            getVertex([a.x, 1, a.y], [a.x, a.y]),
             getVertex([b.x, 1, b.y], [b.x, b.y]),
-            getVertex([a.x, 1, a.y], [a.x, a.y])
+            getVertex([c.x, 1, c.y], [c.x, c.y])
           )
           b = c
         }

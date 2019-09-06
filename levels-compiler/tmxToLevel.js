@@ -30,11 +30,7 @@ function tmxToLevel(xmlText, id) {
 
         // Polygons are all counterclockwise
 
-        level.polys.push(
-          ...absHol(points)
-            .map(orderCounterClockwise)
-            .reverse()
-        )
+        level.polys.push(...absHol(points).map(orderCounterClockwise))
         level.walls.push(orderCounterClockwise(points))
       }
     },

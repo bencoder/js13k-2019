@@ -71,21 +71,21 @@ let footstepPlaying = false
 const Sounds = {
   step() {
     if (!footstepPlaying) {
-      footstep.play()
+      //footstep.play()
       footstepPlaying = true
       setTimeout(() => (footstepPlaying = false), 250)
     }
   },
   doorOpen() {
-    doorOpen.play()
+    //doorOpen.play()
   },
   doorClose() {
-    doorClose.play()
+    //doorClose.play()
   },
   death() {
-    death.play()
+    //death.play()
   },
   win() {
-    winLevel.play()
+    //winLevel.play()
   }
 }

@@ -314,7 +314,7 @@ const Drawing = function(canvas) {
 
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
-    gl.clearColor(0.5, 0.5, 0.5, 1)
+    gl.clearColor(0, 0, 0, 1)
     gl.clearDepth(1.0)
 
     gl.viewport(0.0, 0.0, canvasWidth, canvasHeight)

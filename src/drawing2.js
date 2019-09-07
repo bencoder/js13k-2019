@@ -2,100 +2,65 @@ const Drawing = function (canvas) {
   const gl = canvas.getContext('webgl')
   const Telement = document.getElementById('T')
 
-  const textures = getTextures(gl)
+  //const textures = getTextures(gl)
 
   const scale = 1 / 100
+  const pallette = [
+    [0, 0, 0],
+    [77, 238, 234],
+    [116, 238, 21],
+    [255, 231, 0],
+    [255, 231, 0],
+    [0, 30, 255],
+    [255, 0, 0]
+  ].map(c => c.map(v => v / 255))
 
   function build() {
     const vertices = []
     const normals = []
-    const texcoords = []
+    const colors = []
     const indices = []
 
     const topNormal = [0, 1, 0]
 
     const vertexMap = new Map()
-    const getVertex = (xyz, tex, normal = topNormal) => {
-      const key = JSON.stringify([xyz, tex, normal])
+    const getVertex = (xyz, color, normal = topNormal) => {
+      const key = JSON.stringify([xyz, color, normal])
       let result = vertexMap.get(key)
       if (result === undefined) {
         result = vertexMap.size
         vertexMap.set(key, result)
         vertices.push(-xyz[0] * scale, xyz[1] * scale, xyz[2] * scale)
-        texcoords.push(tex[0] * scale * 4, tex[1] * scale * 4)
+        colors.push(color[0], color[1], color[2])
         normals.push(normal[0], normal[1], normal[2])
       }
       return result
     }
 
-    const getTriangleNormal = (v0, v1, v2) => {
-      const ux = v1[0] - v0[0]
-      const uy = v1[1] - v0[1]
-      const uz = v1[2] - v0[2]
-
-      const vx = v2[0] - v0[0]
-      const vy = v2[1] - v0[1]
-      const vz = v2[2] - v0[2]
-
-      const nx = uy * vz - uz * vy
-      const ny = uz * vx - ux * vz
-      const nz = ux * vy - uy * vx
-
-      const len = Math.sqrt(nx * nx + ny * ny + nz * nz)
-
-      return [nx / len, ny / len, nz / len]
-    }
-
-    const makeWallQuad = (aX, aY, aZ, bX, bY, bZ, tshift, segmentLength) => {
-      const h = bY - aY
-      const p0 = getVertex([aX, aY, aZ], [tshift, 0])
-      const p1 = getVertex([bX, aY, bZ], [tshift + segmentLength, 0])
-      const p2 = getVertex([aX, bY, aZ], [tshift, h])
-      const p3 = getVertex([bX, bY, bZ], [tshift + segmentLength, h])
-      indices.push(p0, p3, p1, p0, p2, p3)
-    }
-
-    const makeFloorQuad = (aX, aY, aZ, bX, bY, bZ) => {
-      const p0 = getVertex([aX, aY, aZ], [aX, aZ])
-      const p1 = getVertex([aX, bY, bZ], [aX, bZ])
-      const p2 = getVertex([bX, aY, aZ], [bX, aZ])
-      const p3 = getVertex([bX, bY, bZ], [bX, bZ])
-      indices.push(p0, p3, p1, p0, p2, p3)
-    }
-
-    const makeTriangle = (v0, v1, v2) => {
+    const makeTriangle = (v0, v1, v2, c) => {
       const U = Vec3.sub(v1, v0)
       const V = Vec3.sub(v2, v0)
       const normal = Vec3.cross(U, V)
       indices.push(
-        getVertex(v0, [v0[0], v0[1]], normal),
-        getVertex(v1, [v1[0], v1[1]], normal),
-        getVertex(v2, [v2[0], v2[1]], normal),
+        getVertex(v0, c, normal),
+        getVertex(v1, c, normal),
+        getVertex(v2, c, normal),
       );
     }
-
-    const makeQuad = (v0, v1, v2, v3) => {
-      const i0 = getVertex(...v0)
-      const i1 = getVertex(...v1)
-      const i2 = getVertex(...v2)
-      const i3 = getVertex(...v3)
-      indices.push(i0, i1, i3, i0, i3, i2)
+    const makeQuad2 = (v0, v1, v2, v3, c) => {
+      makeTriangle(v0, v1, v3, c)
+      makeTriangle(v1, v2, v3, c)
     }
 
-    const makeQuad2 = (v0, v1, v2, v3) => {
-      makeTriangle(v0, v1, v3)
-      makeTriangle(v1, v2, v3)
-    }
-
-    //b and t are each 4 vertexes, anticlockwise for bottom and top of the shape
-    const makeFrustrum = (b, t, fillBottom = false) => {
+    //b and t are each 4 vertexes, anticlockwise (when looking from above) for bottom and top of the shape
+    const makeFrustrum = (b, t, c, c2) => {
       const offset = indices.length;
-      if (fillBottom) makeQuad2(...b)
-      makeQuad2(...t);
-      makeQuad2(b[0], b[1], t[1], t[0]);
-      makeQuad2(b[0], t[0], t[3], b[3]);
-      makeQuad2(b[3], t[3], t[2], b[2]);
-      makeQuad2(b[2], t[2], t[1], b[1]);
+      //makeQuad2(...b, c)
+      makeQuad2(...t, c);
+      makeQuad2(b[0], b[1], t[1], t[0], c2 || c);
+      makeQuad2(b[0], t[0], t[3], b[3], c2 || c);
+      makeQuad2(b[3], t[3], t[2], b[2], c2 || c);
+      makeQuad2(b[2], t[2], t[1], b[1], c2 || c);
       const length = indices.length - offset
       return [offset, length]
     }
@@ -132,60 +97,56 @@ const Drawing = function (canvas) {
           const width = 5
           const topY = -10
           const bottomY = 1
-          const deepdown = 300
+          const deepdown = 1000
 
           // deep down
-          makeQuad(
-            [[b.x, bottomY, b.y], [perimeter0, bottomY], verticalNormal],
-            [[a.x, bottomY, a.y], [perimeter1, bottomY], verticalNormal],
-            [[b.x, deepdown, b.y], [perimeter0, deepdown], verticalNormal],
-            [[a.x, deepdown, a.y], [perimeter1, deepdown], verticalNormal]
+          makeQuad2(
+            [a.x, deepdown, a.y],
+            [b.x, deepdown, b.y],
+            [b.x, bottomY, b.y],
+            [a.x, bottomY, a.y],
+            pallette[1]
           )
 
           const offset = new Vec2(nx, nz).mul(width / 2)
-          const border = [a.add(offset), b.add(offset), b.sub(offset), a.sub(offset)]
-
-          // outer
-          makeQuad(
-            [[border[1].x, bottomY, border[1].y], [perimeter0, bottomY], invVerticalNormal],
-            [[border[0].x, bottomY, border[0].y], [perimeter1, bottomY], invVerticalNormal],
-            [[border[1].x, topY, border[1].y], [perimeter0, topY], invVerticalNormal],
-            [[border[0].x, topY, border[0].y], [perimeter1, topY], invVerticalNormal]
+          const border = [a.sub(offset), b.sub(offset), b.add(offset), a.add(offset)]
+          makeFrustrum(
+            [
+              [border[0].x, bottomY, border[0].y],
+              [border[1].x, bottomY, border[1].y],
+              [border[2].x, bottomY, border[2].y],
+              [border[3].x, bottomY, border[3].y]
+            ], [
+              [border[0].x, topY, border[0].y],
+              [border[1].x, topY, border[1].y],
+              [border[2].x, topY, border[2].y],
+              [border[3].x, topY, border[3].y]
+            ],
+            pallette[5]
           )
 
-          // inner
-          makeQuad(
-            [[border[3].x, bottomY, border[3].y], [perimeter0, bottomY], verticalNormal],
-            [[border[2].x, bottomY, border[2].y], [perimeter1, bottomY], verticalNormal],
-            [[border[3].x, topY, border[3].y], [perimeter0, topY], verticalNormal],
-            [[border[2].x, topY, border[2].y], [perimeter1, topY], verticalNormal]
-          )
 
-          // top
-          makeQuad(
-            [[border[1].x, topY, border[1].y], [border[1].x, border[1].y], topNormal],
-            [[border[0].x, topY, border[0].y], [border[0].x, border[0].y], topNormal],
-            [[border[2].x, topY, border[2].y], [border[2].x, border[2].y], topNormal],
-            [[border[3].x, topY, border[3].y], [border[3].x, border[3].y], topNormal]
-          )
-
-          /*
- 
-          const height = bottomY - topY
-          const pillarY = -15
-
-          const quad2 = [
+          const pillarBorder = [
             a.add({ x: 7, y: 7 }), //front-right
             a.add({ x: 7, y: -7 }), //back-right
             a.add({ x: -7, y: -7 }), //back-left
             a.add({ x: -7, y: 7 }) //front-left
           ]
-          makeWallQuad(quad2[0].x, deepdown, quad2[0].y, quad2[3].x, pillarY, quad2[3].y, 2) //front
-          makeWallQuad(quad2[2].x, deepdown, quad2[2].y, quad2[3].x, pillarY, quad2[3].y, 2) //left
-          makeFloorQuad(quad2[3].x, pillarY, quad2[3].y, quad2[1].x, pillarY, quad2[1].y, 1) //top
-          makeWallQuad(quad2[0].x, deepdown, quad2[0].y, quad2[1].x, pillarY, quad2[1].y, 2) //right
-          makeWallQuad(quad2[1].x, deepdown, quad2[1].y, quad2[2].x, pillarY, quad2[2].y, 2) //back
-          */
+          makeFrustrum(
+            [
+              [pillarBorder[0].x, deepdown, pillarBorder[0].y],
+              [pillarBorder[1].x, deepdown, pillarBorder[1].y],
+              [pillarBorder[2].x, deepdown, pillarBorder[2].y],
+              [pillarBorder[3].x, deepdown, pillarBorder[3].y]
+            ], [
+              [pillarBorder[0].x, topY - 1, pillarBorder[0].y],
+              [pillarBorder[1].x, topY - 1, pillarBorder[1].y],
+              [pillarBorder[2].x, topY - 1, pillarBorder[2].y],
+              [pillarBorder[3].x, topY - 1, pillarBorder[3].y]
+            ],
+            pallette[2]
+          )
+
           perimeter0 = perimeter1
         }
       }
@@ -196,16 +157,13 @@ const Drawing = function (canvas) {
         for (let i = 2; i < pts.length; ++i) {
           const c = pts[i]
           indices.push(
-            getVertex([a.x, 1, a.y], [a.x, a.y]),
-            getVertex([b.x, 1, b.y], [b.x, b.y]),
-            getVertex([c.x, 1, c.y], [c.x, c.y])
+            getVertex([a.x, 1, a.y], pallette[4]),
+            getVertex([b.x, 1, b.y], pallette[4]),
+            getVertex([c.x, 1, c.y], pallette[4])
           )
           b = c
         }
       }
-
-
-
 
       level.indexBufferOffset = indexBufferOffset
       level.indexBufferLength = indices.length - indexBufferOffset
@@ -227,29 +185,29 @@ const Drawing = function (canvas) {
           [s.x - switchSize, switchTop, s.y - switchSize],
           [s.x - switchSize, switchTop, s.y + switchSize],
         ]
-        const [o, l] = makeFrustrum(bottom, top);
+        const [o, l] = makeFrustrum(bottom, top, pallette[5], pallette[0]);
         s.indexBufferOffset = o
         s.indexBufferLength = l
       }
 
 
-      const doorTop = -10
+
       for (const d of level.doors) {
         const p = d.polygon;
-        if (p.length < 4) continue; //Doors must have 4 corners
+        if (p.length < 4) continue;
         const bottom = [
-          [p[0].x, 1, p[0].y],
-          [p[1].x, 1, p[1].y],
-          [p[2].x, 1, p[2].y],
-          [p[3].x, 1, p[3].y],
+          [p[0].x, -1, p[0].y],
+          [p[1].x, -1, p[1].y],
+          [p[2].x, -1, p[2].y],
+          [p[3].x, -1, p[3].y],
         ];
         const top = [
-          [p[0].x, doorTop, p[0].y],
-          [p[1].x, doorTop, p[1].y],
-          [p[2].x, doorTop, p[2].y],
-          [p[3].x, doorTop, p[3].y],
+          [p[0].x, -3, p[0].y],
+          [p[1].x, -3, p[1].y],
+          [p[2].x, -3, p[2].y],
+          [p[3].x, -3, p[3].y],
         ];
-        const [o, l] = makeFrustrum(bottom, top);
+        const [o, l] = makeFrustrum(bottom, top, pallette[6]);
         d.indexBufferOffset = o
         d.indexBufferLength = l
       }
@@ -258,7 +216,7 @@ const Drawing = function (canvas) {
     return {
       vertices: new Float32Array(vertices),
       normals: new Float32Array(normals),
-      texcoords: new Float32Array(texcoords),
+      colors: new Float32Array(colors),
       indices: new Uint16Array(indices)
     }
   }
@@ -274,7 +232,7 @@ const Drawing = function (canvas) {
 
   const vertex_buffer = createGlBuffer(built.vertices)
   const normal_buffer = createGlBuffer(built.normals)
-  const texcoords_buffer = createGlBuffer(built.texcoords)
+  const colors_buffer = createGlBuffer(built.colors)
   const index_buffer = createGlBuffer(built.indices, gl.ELEMENT_ARRAY_BUFFER)
 
   const canvasWidth = canvas.clientWidth
@@ -293,6 +251,11 @@ const Drawing = function (canvas) {
     const shader = gl.createShader(type)
     gl.shaderSource(shader, input)
     gl.compileShader(shader)
+    var compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+    console.log('Shader compiled successfully: ' + compiled);
+    var compilationLog = gl.getShaderInfoLog(shader);
+    console.log('Shader compiler log: ' + compilationLog);
+
     gl.attachShader(program, shader)
   }
 
@@ -310,7 +273,7 @@ const Drawing = function (canvas) {
   const uVmatrix = gl.getUniformLocation(shaderProgram, 'Vmatrix')
   const uPosition = gl.getAttribLocation(shaderProgram, 'position')
   const uNormal = gl.getAttribLocation(shaderProgram, 'normal')
-  const uTexcoords = gl.getAttribLocation(shaderProgram, 'texcoords')
+  const uColor = gl.getAttribLocation(shaderProgram, 'color')
   const uPlayerLightPosition = gl.getUniformLocation(shaderProgram, 'playerLightPosition')
 
   this.scale = 1.5
@@ -337,7 +300,7 @@ const Drawing = function (canvas) {
 
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
-    gl.clearColor(0.5, 0.5, 0.5, 1)
+    gl.clearColor(0, 0, 0, 1)
     gl.clearDepth(1.0)
 
     gl.viewport(0.0, 0.0, canvasWidth, canvasHeight)
@@ -368,10 +331,10 @@ const Drawing = function (canvas) {
 
 
   this.level = level => {
-    gl.bindTexture(gl.TEXTURE_2D, textures.t1)
+    //gl.bindTexture(gl.TEXTURE_2D, textures.t1)
 
-    //  gl.enable(gl.CULL_FACE)
-    //  gl.cullFace(gl.BACK)
+    gl.enable(gl.CULL_FACE)
+    gl.cullFace(gl.BACK)
 
     gl.useProgram(shaderProgram)
 
@@ -390,9 +353,9 @@ const Drawing = function (canvas) {
     gl.vertexAttribPointer(uNormal, 3, gl.FLOAT, true, 0, 0)
     gl.enableVertexAttribArray(uNormal)
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, texcoords_buffer)
-    gl.vertexAttribPointer(uTexcoords, 2, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(uTexcoords)
+    gl.bindBuffer(gl.ARRAY_BUFFER, colors_buffer)
+    gl.vertexAttribPointer(uColor, 3, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(uColor)
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer)
 

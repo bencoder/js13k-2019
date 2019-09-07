@@ -16,6 +16,17 @@ const Drawing = function(canvas) {
     [255, 0, 255]
   ].map(c => c.map(v => v / 255))
 
+  const sprites = {
+    player: {
+      offset: 0,
+      length: 0
+    },
+    ghost: {
+      offset: 0,
+      length: 0
+    }
+  }
+
   function build() {
     const vertices = []
     const normals = []
@@ -118,10 +129,10 @@ const Drawing = function(canvas) {
           )
 
           const pillarBorder = [
-            a.add({ x: 7, y: 7 }), //front-right
-            a.add({ x: 7, y: -7 }), //back-right
-            a.add({ x: -7, y: -7 }), //back-left
-            a.add({ x: -7, y: 7 }) //front-left
+            a.add({ x: 5, y: 5 }), //front-right
+            a.add({ x: 5, y: -5 }), //back-right
+            a.add({ x: -5, y: -5 }), //back-left
+            a.add({ x: -5, y: 5 }) //front-left
           ]
           makeFrustrum(
             [
@@ -210,6 +221,14 @@ const Drawing = function(canvas) {
       }
     }
 
+    sprites.player.offset = indices.length
+    makeTriangle([0, 0, -10], [-6, 0, 5], [6, 0, 5], [255, 0, 0])
+    sprites.player.length = indices.length - sprites.player.offset
+
+    sprites.ghost.offset = indices.length
+    makeTriangle([0, 0, -10], [-6, 0, 5], [6, 0, 5], [0, 0, 0])
+    sprites.ghost.length = indices.length - sprites.ghost.offset
+
     return {
       vertices: new Float32Array(vertices),
       normals: new Float32Array(normals),
@@ -295,7 +314,7 @@ const Drawing = function(canvas) {
 
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
-    gl.clearColor(0, 0, 0, 1)
+    gl.clearColor(0.5, 0.5, 0.5, 1)
     gl.clearDepth(1.0)
 
     gl.viewport(0.0, 0.0, canvasWidth, canvasHeight)
@@ -314,14 +333,29 @@ const Drawing = function(canvas) {
   }
 
   this.player = player => {
-    // TODO interpolate(player.position, player.movementVector), 10
+    const pos = interpolate(player.position, player.movementVector)
+    calcViewMatrix()
+    mat4.translate(viewMatrix, viewMatrix, [-pos.x * scale, -0.03, pos.y * scale])
+    mat4.rotateY(
+      viewMatrix,
+      viewMatrix,
+      -Math.atan2(-player.drawMovementVector.y, player.drawMovementVector.x) + Math.PI / 2
+    )
+
+    gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
+    gl.drawElements(gl.TRIANGLES, sprites.player.length, gl.UNSIGNED_SHORT, sprites.player.offset * 2)
   }
 
   this.ghost = ghost => {
     if (ghost.dead) {
       return false
     }
-    // TODO interpolate(ghost.position, ghost.movementVector), 10
+    const pos = interpolate(ghost.position, ghost.movementVector)
+    calcViewMatrix()
+    mat4.translate(viewMatrix, viewMatrix, [-pos.x * scale, -0.01, pos.y * scale])
+    mat4.rotateY(viewMatrix, viewMatrix, -Math.atan2(-ghost.movementVector.y, ghost.movementVector.x) + Math.PI / 2)
+    gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
+    gl.drawElements(gl.TRIANGLES, sprites.ghost.length, gl.UNSIGNED_SHORT, sprites.ghost.offset * 2)
   }
 
   this.level = level => {

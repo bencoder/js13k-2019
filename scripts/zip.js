@@ -7,6 +7,7 @@ const archiver = require('archiver')
 const minifyHtml = require('./lib/minifyHtml')
 const minifyJs = require('./lib/minifyJs')
 const humanReadableFileSize = require('./lib/humanReadableFileSize')
+const { getUsedBrowserGlobals } = require('./lib/browserGlobals')
 
 const rootFolder = path.resolve(__dirname, '../')
 const srcFolder = path.resolve(rootFolder, 'src')
@@ -58,6 +59,12 @@ async function build() {
 
   if (options.minifyJs) {
     mergedJs = minifyJs(mergedJs)
+    const usedGlobals = getUsedBrowserGlobals(mergedJs).join(',')
+    console.log('Used globals: ', usedGlobals)
+    mergedJs = `((${usedGlobals})=>{${mergedJs}})(${usedGlobals})`
+    mergedJs = minifyJs(mergedJs)
+  } else {
+    mergedJs = `(()=>{${mergedJs}})()`
   }
 
   $('<script></script>')

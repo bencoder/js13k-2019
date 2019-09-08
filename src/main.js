@@ -16,7 +16,7 @@ game.loadLevel(levelIndex)
 let previous
 let accumulator = 0 //stores incrementing value (in seconds) until the next tick, when it's then decremented by 1 tick's length
 const update = time => {
-  window.requestAnimationFrame(update)
+  requestAnimationFrame(update)
   if (previous === undefined) {
     previous = time
   }
@@ -35,7 +35,7 @@ const update = time => {
 
   previous = time
 }
-window.requestAnimationFrame(update)
+requestAnimationFrame(update)
 
 const keyMap = {
   ArrowUp: 'up',

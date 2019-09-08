@@ -324,11 +324,11 @@ const Drawing = function(canvas) {
   this.endScreen = () => {}
 
   function calcViewMatrix(out = viewMatrix) {
-    mat4.identity(out)
-    mat4.rotateX(out, out, cameraRotX)
-    mat4.rotateY(out, out, cameraRotY)
-    mat4.rotateZ(out, out, -Math.PI)
-    mat4.translate(out, out, [-cameraPos[0], -cameraPos[1], -cameraPos[2]])
+    out.set(mat4Identity)
+    mat4RotateX(out, cameraRotX)
+    mat4RotateY(out, cameraRotY)
+    mat4RotateZ(out, -Math.PI)
+    mat4Translate(out, -cameraPos[0], -cameraPos[1], -cameraPos[2])
   }
 
   function calcProjectionMatrix() {

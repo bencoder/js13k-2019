@@ -2,73 +2,75 @@ const Drawing = function(canvas) {
   const gl = canvas.getContext('webgl')
   const Telement = document.getElementById('T')
 
-  const textures = getTextures(gl)
+  //const textures = getTextures(gl)
 
   const scale = 1 / 100
+  const pallette = [
+    [0, 0, 0],
+    [77, 238, 234],
+    [116, 238, 21],
+    [255, 231, 0],
+    [255, 231, 0],
+    [0, 30, 255],
+    [255, 0, 0],
+    [255, 0, 255]
+  ].map(c => c.map(v => v / 255))
+
+  const sprites = {
+    player: {
+      offset: 0,
+      length: 0
+    },
+    ghost: {
+      offset: 0,
+      length: 0
+    }
+  }
 
   function build() {
     const vertices = []
     const normals = []
-    const texcoords = []
+    const colors = []
     const indices = []
 
     const topNormal = [0, 1, 0]
 
     const vertexMap = new Map()
-    const getVertex = (xyz, tex, normal = topNormal) => {
-      const key = JSON.stringify([xyz, tex, normal])
+    const getVertex = (xyz, color, normal = topNormal) => {
+      const key = JSON.stringify([xyz, color, normal])
       let result = vertexMap.get(key)
       if (result === undefined) {
         result = vertexMap.size
         vertexMap.set(key, result)
         vertices.push(-xyz[0] * scale, xyz[1] * scale, xyz[2] * scale)
-        texcoords.push(tex[0] * scale * 4, tex[1] * scale * 4)
+        colors.push(color[0], color[1], color[2])
         normals.push(normal[0], normal[1], normal[2])
       }
       return result
     }
 
-    const getTriangleNormal = (v0, v1, v2) => {
-      const ux = v1[0] - v0[0]
-      const uy = v1[1] - v0[1]
-      const uz = v1[2] - v0[2]
-
-      const vx = v2[0] - v0[0]
-      const vy = v2[1] - v0[1]
-      const vz = v2[2] - v0[2]
-
-      const nx = uy * vz - uz * vy
-      const ny = uz * vx - ux * vz
-      const nz = ux * vy - uy * vx
-
-      const len = Math.sqrt(nx * nx + ny * ny + nz * nz)
-
-      return [nx / len, ny / len, nz / len]
+    const makeTriangle = (v0, v1, v2, c) => {
+      const U = Vec3.sub(v1, v0)
+      const V = Vec3.sub(v2, v0)
+      const normal = Vec3.cross(U, V)
+      indices.push(getVertex(v0, c, normal), getVertex(v1, c, normal), getVertex(v2, c, normal))
+    }
+    const makeQuad2 = (v0, v1, v2, v3, c) => {
+      makeTriangle(v0, v1, v3, c)
+      makeTriangle(v1, v2, v3, c)
     }
 
-    const makeWallQuad = (aX, aY, aZ, bX, bY, bZ, tshift, segmentLength) => {
-      const h = bY - aY
-      const p0 = getVertex([aX, aY, aZ], [tshift, 0])
-      const p1 = getVertex([bX, aY, bZ], [tshift + segmentLength, 0])
-      const p2 = getVertex([aX, bY, aZ], [tshift, h])
-      const p3 = getVertex([bX, bY, bZ], [tshift + segmentLength, h])
-      indices.push(p0, p3, p1, p0, p2, p3)
-    }
-
-    const makeFloorQuad = (aX, aY, aZ, bX, bY, bZ) => {
-      const p0 = getVertex([aX, aY, aZ], [aX, aZ])
-      const p1 = getVertex([aX, bY, bZ], [aX, bZ])
-      const p2 = getVertex([bX, aY, aZ], [bX, aZ])
-      const p3 = getVertex([bX, bY, bZ], [bX, bZ])
-      indices.push(p0, p3, p1, p0, p2, p3)
-    }
-
-    const makeQuad = (v0, v1, v2, v3) => {
-      const i0 = getVertex(...v0)
-      const i1 = getVertex(...v1)
-      const i2 = getVertex(...v2)
-      const i3 = getVertex(...v3)
-      indices.push(i0, i1, i3, i0, i3, i2)
+    //b and t are each 4 vertexes, anticlockwise (when looking from above) for bottom and top of the shape
+    const makeFrustrum = (b, t, c, c2) => {
+      const offset = indices.length
+      //makeQuad2(...b, c)
+      makeQuad2(...t, c)
+      makeQuad2(b[0], b[1], t[1], t[0], c2 || c)
+      makeQuad2(b[0], t[0], t[3], b[3], c2 || c)
+      makeQuad2(b[3], t[3], t[2], b[2], c2 || c)
+      makeQuad2(b[2], t[2], t[1], b[1], c2 || c)
+      const length = indices.length - offset
+      return [offset, length]
     }
 
     for (const level of levels) {
@@ -103,60 +105,51 @@ const Drawing = function(canvas) {
           const width = 5
           const topY = -10
           const bottomY = 1
-          const deepdown = 300
+          const deepdown = 1000
 
           // deep down
-          makeQuad(
-            [[b.x, bottomY, b.y], [perimeter0, bottomY], verticalNormal],
-            [[a.x, bottomY, a.y], [perimeter1, bottomY], verticalNormal],
-            [[b.x, deepdown, b.y], [perimeter0, deepdown], verticalNormal],
-            [[a.x, deepdown, a.y], [perimeter1, deepdown], verticalNormal]
-          )
+          makeQuad2([a.x, deepdown, a.y], [b.x, deepdown, b.y], [b.x, bottomY, b.y], [a.x, bottomY, a.y], pallette[7])
 
           const offset = new Vec2(nx, nz).mul(width / 2)
-          const border = [a.add(offset), b.add(offset), b.sub(offset), a.sub(offset)]
-
-          // outer
-          makeQuad(
-            [[border[1].x, bottomY, border[1].y], [perimeter0, bottomY], invVerticalNormal],
-            [[border[0].x, bottomY, border[0].y], [perimeter1, bottomY], invVerticalNormal],
-            [[border[1].x, topY, border[1].y], [perimeter0, topY], invVerticalNormal],
-            [[border[0].x, topY, border[0].y], [perimeter1, topY], invVerticalNormal]
+          const border = [a.sub(offset), b.sub(offset), b.add(offset), a.add(offset)]
+          makeFrustrum(
+            [
+              [border[0].x, bottomY, border[0].y],
+              [border[1].x, bottomY, border[1].y],
+              [border[2].x, bottomY, border[2].y],
+              [border[3].x, bottomY, border[3].y]
+            ],
+            [
+              [border[0].x, topY, border[0].y],
+              [border[1].x, topY, border[1].y],
+              [border[2].x, topY, border[2].y],
+              [border[3].x, topY, border[3].y]
+            ],
+            pallette[5]
           )
 
-          // inner
-          makeQuad(
-            [[border[3].x, bottomY, border[3].y], [perimeter0, bottomY], verticalNormal],
-            [[border[2].x, bottomY, border[2].y], [perimeter1, bottomY], verticalNormal],
-            [[border[3].x, topY, border[3].y], [perimeter0, topY], verticalNormal],
-            [[border[2].x, topY, border[2].y], [perimeter1, topY], verticalNormal]
-          )
-
-          // top
-          makeQuad(
-            [[border[1].x, topY, border[1].y], [border[1].x, border[1].y], topNormal],
-            [[border[0].x, topY, border[0].y], [border[0].x, border[0].y], topNormal],
-            [[border[2].x, topY, border[2].y], [border[2].x, border[2].y], topNormal],
-            [[border[3].x, topY, border[3].y], [border[3].x, border[3].y], topNormal]
-          )
-
-          /*
- 
-          const height = bottomY - topY
-          const pillarY = -15
-
-          const quad2 = [
-            a.add({ x: 7, y: 7 }), //front-right
-            a.add({ x: 7, y: -7 }), //back-right
-            a.add({ x: -7, y: -7 }), //back-left
-            a.add({ x: -7, y: 7 }) //front-left
+          const pillarBorder = [
+            a.add({ x: 5, y: 5 }), //front-right
+            a.add({ x: 5, y: -5 }), //back-right
+            a.add({ x: -5, y: -5 }), //back-left
+            a.add({ x: -5, y: 5 }) //front-left
           ]
-          makeWallQuad(quad2[0].x, deepdown, quad2[0].y, quad2[3].x, pillarY, quad2[3].y, 2) //front
-          makeWallQuad(quad2[2].x, deepdown, quad2[2].y, quad2[3].x, pillarY, quad2[3].y, 2) //left
-          makeFloorQuad(quad2[3].x, pillarY, quad2[3].y, quad2[1].x, pillarY, quad2[1].y, 1) //top
-          makeWallQuad(quad2[0].x, deepdown, quad2[0].y, quad2[1].x, pillarY, quad2[1].y, 2) //right
-          makeWallQuad(quad2[1].x, deepdown, quad2[1].y, quad2[2].x, pillarY, quad2[2].y, 2) //back
-          */
+          makeFrustrum(
+            [
+              [pillarBorder[0].x, deepdown, pillarBorder[0].y],
+              [pillarBorder[1].x, deepdown, pillarBorder[1].y],
+              [pillarBorder[2].x, deepdown, pillarBorder[2].y],
+              [pillarBorder[3].x, deepdown, pillarBorder[3].y]
+            ],
+            [
+              [pillarBorder[0].x, topY - 1, pillarBorder[0].y],
+              [pillarBorder[1].x, topY - 1, pillarBorder[1].y],
+              [pillarBorder[2].x, topY - 1, pillarBorder[2].y],
+              [pillarBorder[3].x, topY - 1, pillarBorder[3].y]
+            ],
+            pallette[2]
+          )
+
           perimeter0 = perimeter1
         }
       }
@@ -167,9 +160,9 @@ const Drawing = function(canvas) {
         for (let i = 2; i < pts.length; ++i) {
           const c = pts[i]
           indices.push(
-            getVertex([a.x, 1, a.y], [a.x, a.y]),
-            getVertex([b.x, 1, b.y], [b.x, b.y]),
-            getVertex([c.x, 1, c.y], [c.x, c.y])
+            getVertex([a.x, 1, a.y], pallette[4]),
+            getVertex([b.x, 1, b.y], pallette[4]),
+            getVertex([c.x, 1, c.y], pallette[4])
           )
           b = c
         }
@@ -177,12 +170,69 @@ const Drawing = function(canvas) {
 
       level.indexBufferOffset = indexBufferOffset
       level.indexBufferLength = indices.length - indexBufferOffset
+
+      const switchSize = 25
+      const switchTop = -2
+      for (const s of level.switches) {
+        const p = new Vec2(s.x, s.y)
+        const bottom = [
+          [s.x + switchSize, 1, s.y + switchSize],
+          [s.x + switchSize, 1, s.y - switchSize],
+          [s.x - switchSize, 1, s.y - switchSize],
+          [s.x - switchSize, 1, s.y + switchSize]
+        ]
+        const top = [
+          [s.x + switchSize, switchTop, s.y + switchSize],
+          [s.x + switchSize, switchTop, s.y - switchSize],
+          [s.x - switchSize, switchTop, s.y - switchSize],
+          [s.x - switchSize, switchTop, s.y + switchSize]
+        ]
+        const [o, l] = makeFrustrum(bottom, top, pallette[5], pallette[0])
+        s.indexBufferOffset = o
+        s.indexBufferLength = l
+      }
+
+      for (const d of level.doors) {
+        const p = d.polygon
+        const p0 = new Vec2(p[0].x, p[0].y)
+        const p1 = new Vec2(p[1].x, p[1].y)
+        const normal = p1.sub(p0).normal()
+        const offset = normal.mul(1)
+        const border = [p0.sub(offset), p1.sub(offset), p1.add(offset), p0.add(offset)]
+        const bottomY = -4
+        const topY = -6
+        const [o, l] = makeFrustrum(
+          [
+            [border[0].x, bottomY, border[0].y],
+            [border[1].x, bottomY, border[1].y],
+            [border[2].x, bottomY, border[2].y],
+            [border[3].x, bottomY, border[3].y]
+          ],
+          [
+            [border[0].x, topY, border[0].y],
+            [border[1].x, topY, border[1].y],
+            [border[2].x, topY, border[2].y],
+            [border[3].x, topY, border[3].y]
+          ],
+          pallette[6]
+        )
+        d.indexBufferOffset = o
+        d.indexBufferLength = l
+      }
     }
+
+    sprites.player.offset = indices.length
+    makeTriangle([0, 0, -10], [-6, 0, 5], [6, 0, 5], [255, 0, 0])
+    sprites.player.length = indices.length - sprites.player.offset
+
+    sprites.ghost.offset = indices.length
+    makeTriangle([0, 0, -10], [-6, 0, 5], [6, 0, 5], [0, 0, 0])
+    sprites.ghost.length = indices.length - sprites.ghost.offset
 
     return {
       vertices: new Float32Array(vertices),
       normals: new Float32Array(normals),
-      texcoords: new Float32Array(texcoords),
+      colors: new Float32Array(colors),
       indices: new Uint16Array(indices)
     }
   }
@@ -198,7 +248,7 @@ const Drawing = function(canvas) {
 
   const vertex_buffer = createGlBuffer(built.vertices)
   const normal_buffer = createGlBuffer(built.normals)
-  const texcoords_buffer = createGlBuffer(built.texcoords)
+  const colors_buffer = createGlBuffer(built.colors)
   const index_buffer = createGlBuffer(built.indices, gl.ELEMENT_ARRAY_BUFFER)
 
   const canvasWidth = canvas.clientWidth
@@ -217,6 +267,9 @@ const Drawing = function(canvas) {
     const shader = gl.createShader(type)
     gl.shaderSource(shader, input)
     gl.compileShader(shader)
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      console.log('Shader compilation failed: ' + gl.getShaderInfoLog(shader))
+    }
     gl.attachShader(program, shader)
   }
 
@@ -234,7 +287,7 @@ const Drawing = function(canvas) {
   const uVmatrix = gl.getUniformLocation(shaderProgram, 'Vmatrix')
   const uPosition = gl.getAttribLocation(shaderProgram, 'position')
   const uNormal = gl.getAttribLocation(shaderProgram, 'normal')
-  const uTexcoords = gl.getAttribLocation(shaderProgram, 'texcoords')
+  const uColor = gl.getAttribLocation(shaderProgram, 'color')
   const uPlayerLightPosition = gl.getUniformLocation(shaderProgram, 'playerLightPosition')
 
   this.scale = 1.5
@@ -261,7 +314,7 @@ const Drawing = function(canvas) {
 
     gl.enable(gl.DEPTH_TEST)
     gl.depthFunc(gl.LEQUAL)
-    gl.clearColor(0.5, 0.5, 0.5, 1)
+    gl.clearColor(0, 0, 0, 1)
     gl.clearDepth(1.0)
 
     gl.viewport(0.0, 0.0, canvasWidth, canvasHeight)
@@ -280,18 +333,33 @@ const Drawing = function(canvas) {
   }
 
   this.player = player => {
-    // TODO interpolate(player.position, player.movementVector), 10
+    const pos = interpolate(player.position, player.movementVector)
+    calcViewMatrix()
+    mat4.translate(viewMatrix, viewMatrix, [-pos.x * scale, -0.03, pos.y * scale])
+    mat4.rotateY(
+      viewMatrix,
+      viewMatrix,
+      -Math.atan2(-player.drawMovementVector.y, player.drawMovementVector.x) + Math.PI / 2
+    )
+
+    gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
+    gl.drawElements(gl.TRIANGLES, sprites.player.length, gl.UNSIGNED_SHORT, sprites.player.offset * 2)
   }
 
   this.ghost = ghost => {
     if (ghost.dead) {
       return false
     }
-    // TODO interpolate(ghost.position, ghost.movementVector), 10
+    const pos = interpolate(ghost.position, ghost.movementVector)
+    calcViewMatrix()
+    mat4.translate(viewMatrix, viewMatrix, [-pos.x * scale, -0.01, pos.y * scale])
+    mat4.rotateY(viewMatrix, viewMatrix, -Math.atan2(-ghost.movementVector.y, ghost.movementVector.x) + Math.PI / 2)
+    gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
+    gl.drawElements(gl.TRIANGLES, sprites.ghost.length, gl.UNSIGNED_SHORT, sprites.ghost.offset * 2)
   }
 
   this.level = level => {
-    gl.bindTexture(gl.TEXTURE_2D, textures.t1)
+    //gl.bindTexture(gl.TEXTURE_2D, textures.t1)
 
     gl.enable(gl.CULL_FACE)
     gl.cullFace(gl.BACK)
@@ -303,6 +371,7 @@ const Drawing = function(canvas) {
     gl.uniform3fv(uPlayerLightPosition, playerLightPosition)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
+
     gl.vertexAttribPointer(uPosition, 3, gl.FLOAT, false, 0, 0)
     gl.enableVertexAttribArray(uPosition)
 
@@ -310,13 +379,29 @@ const Drawing = function(canvas) {
     gl.vertexAttribPointer(uNormal, 3, gl.FLOAT, true, 0, 0)
     gl.enableVertexAttribArray(uNormal)
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, texcoords_buffer)
-    gl.vertexAttribPointer(uTexcoords, 2, gl.FLOAT, false, 0, 0)
-    gl.enableVertexAttribArray(uTexcoords)
+    gl.bindBuffer(gl.ARRAY_BUFFER, colors_buffer)
+    gl.vertexAttribPointer(uColor, 3, gl.FLOAT, false, 0, 0)
+    gl.enableVertexAttribArray(uColor)
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, index_buffer)
 
     gl.drawElements(gl.TRIANGLES, level.indexBufferLength, gl.UNSIGNED_SHORT, level.indexBufferOffset * 2)
+
+    for (s of level.switches) {
+      if (s.pressed) {
+        mat4.translate(viewMatrix, viewMatrix, [0, 2 * scale, 0])
+        gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
+      }
+      gl.drawElements(gl.TRIANGLES, s.indexBufferLength, gl.UNSIGNED_SHORT, s.indexBufferOffset * 2)
+      if (s.pressed) {
+        mat4.translate(viewMatrix, viewMatrix, [0, -2 * scale, 0])
+        gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
+      }
+    }
+    for (d of level.doors) {
+      if (d.open) continue
+      gl.drawElements(gl.TRIANGLES, d.indexBufferLength, gl.UNSIGNED_SHORT, d.indexBufferOffset * 2)
+    }
   }
 
   this.titleScreen = () => {}

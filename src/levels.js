@@ -34,7 +34,13 @@ const levels = [
     doors: [
       {
         name: "door1",
-        polygon: [{ x: 416, y: 288 }, { x: 480, y: 288 }, { x: 416, y: 288 }],
+        polygon: [
+          { x: 416, y: 288 },
+          { x: 480, y: 288 },
+          { x: 480, y: 297 },
+          { x: 416, y: 297 },
+          { x: 416, y: 288 }
+        ],
         open: false
       }
     ],
@@ -162,17 +168,18 @@ const levels = [
     doors: [
       {
         name: "door2",
-        polygon: [{ x: 448, y: 352 }, { x: 512, y: 352 }, { x: 448, y: 352 }],
+        polygon: [
+          { x: 448, y: 352 },
+          { x: 512, y: 352 },
+          { x: 512, y: 359 },
+          { x: 448, y: 359 },
+          { x: 448, y: 352 }
+        ],
         open: false
       },
       {
         name: "door1",
-        polygon: [
-          { x: 448, y: 416 },
-          { x: 448, y: 416 },
-          { x: 512, y: 416 },
-          { x: 448, y: 416 }
-        ],
+        polygon: [{ x: 448, y: 416 }, { x: 512, y: 416 }, { x: 448, y: 416 }],
         open: false
       }
     ],
@@ -271,12 +278,24 @@ const levels = [
     doors: [
       {
         name: "door2",
-        polygon: [{ x: 448, y: 352 }, { x: 512, y: 352 }, { x: 448, y: 352 }],
+        polygon: [
+          { x: 448, y: 352 },
+          { x: 512, y: 352 },
+          { x: 512, y: 359 },
+          { x: 448, y: 359 },
+          { x: 448, y: 352 }
+        ],
         open: false
       },
       {
         name: "door1",
-        polygon: [{ x: 448, y: 672 }, { x: 448, y: 736 }, { x: 448, y: 672 }],
+        polygon: [
+          { x: 448, y: 672 },
+          { x: 448, y: 736 },
+          { x: 440, y: 736 },
+          { x: 440, y: 672 },
+          { x: 448, y: 672 }
+        ],
         open: false
       }
     ],

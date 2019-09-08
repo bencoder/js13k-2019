@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="12">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="13">
  <objectgroup id="2" name="walls"/>
  <objectgroup id="3" name="features">
   <object id="2" name="start" type="start" x="352" y="896">
@@ -12,7 +12,7 @@
    <properties>
     <property name="open" type="bool" value="false"/>
    </properties>
-   <polygon points="0,0 64,0 0,0"/>
+   <polygon points="0,0 64,0 64.1818,6.54545 0.181818,6.54545"/>
   </object>
   <object id="6" name="switch1" type="switch" x="768" y="672">
    <properties>
@@ -20,12 +20,6 @@
     <property name="type" value="momentary"/>
    </properties>
    <point/>
-  </object>
-  <object id="7" name="door1" type="door" x="448" y="672">
-   <properties>
-    <property name="open" type="bool" value="false"/>
-   </properties>
-   <polygon points="0,-256 0,-256 64,-256"/>
   </object>
   <object id="9" name="switch2" type="switch" x="640" y="672">
    <properties>
@@ -36,6 +30,12 @@
   </object>
   <object id="10" type="wall" x="448" y="960">
    <polygon points="-160,0 -160,-160 -32,-160 -32,-128 0,-128 0,-192 -128,-256 -128,-384 0,-480 0,-608 -32,-608 -32,-736 96,-736 96,-608 64,-608 64,-608 64,-480 288,-480 288,-352 384,-352 384,-224 128,-224 128,-352 224,-352 224,-416 96,-416 -32,-320 64,-256 64,-64 -32,-64 -32,0"/>
+  </object>
+  <object id="12" name="door1" type="door" x="448" y="416">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="0,0 64,0 0,0"/>
   </object>
  </objectgroup>
 </map>

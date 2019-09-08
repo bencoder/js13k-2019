@@ -1,10 +1,13 @@
 function Player(level) {
   this.position = level.getStart()
   this.movementVector = new Vec2(0, 0) //stores last movement vector
+  this.drawMovementVector = new Vec2(0, -1)
 
   this.forceMove = v => {
     this.movementVector = v
     this.position = this.position.add(v)
+
+    this.drawMovementVector = this.movementVector.mul(-1) //reverse so we draw correctly
   }
 
   this.move = buttons => {
@@ -26,6 +29,7 @@ function Player(level) {
     this.movementVector = level.interact(this.position, Settings.playerRadius, movement)
     this.position = this.position.add(this.movementVector)
     if (this.movementVector.x != 0 || this.movementVector.y != 0) {
+      this.drawMovementVector = this.movementVector
       Sounds.step()
     }
 

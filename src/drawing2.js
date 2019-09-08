@@ -268,7 +268,7 @@ const Drawing = function(canvas) {
     gl.shaderSource(shader, input)
     gl.compileShader(shader)
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.log('Shader compilation failed: ' + gl.getShaderInfoLog(shader))
+      console.log(`Shader compilation failed: ${gl.getShaderInfoLog(shader)}`)
     }
     gl.attachShader(program, shader)
   }
@@ -335,12 +335,8 @@ const Drawing = function(canvas) {
   this.player = player => {
     const pos = interpolate(player.position, player.movementVector)
     calcViewMatrix()
-    mat4.translate(viewMatrix, viewMatrix, [-pos.x * scale, -0.03, pos.y * scale])
-    mat4.rotateY(
-      viewMatrix,
-      viewMatrix,
-      -Math.atan2(-player.drawMovementVector.y, player.drawMovementVector.x) + Math.PI / 2
-    )
+    mat4Translate(viewMatrix, -pos.x * scale, -0.03, pos.y * scale)
+    mat4RotateY(viewMatrix, -Math.atan2(-player.drawMovementVector.y, player.drawMovementVector.x) + Math.PI / 2)
 
     gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
     gl.drawElements(gl.TRIANGLES, sprites.player.length, gl.UNSIGNED_SHORT, sprites.player.offset * 2)
@@ -352,8 +348,8 @@ const Drawing = function(canvas) {
     }
     const pos = interpolate(ghost.position, ghost.movementVector)
     calcViewMatrix()
-    mat4.translate(viewMatrix, viewMatrix, [-pos.x * scale, -0.01, pos.y * scale])
-    mat4.rotateY(viewMatrix, viewMatrix, -Math.atan2(-ghost.movementVector.y, ghost.movementVector.x) + Math.PI / 2)
+    mat4Translate(viewMatrix, -pos.x * scale, -0.01, pos.y * scale)
+    mat4RotateY(viewMatrix, -Math.atan2(-ghost.movementVector.y, ghost.movementVector.x) + Math.PI / 2)
     gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
     gl.drawElements(gl.TRIANGLES, sprites.ghost.length, gl.UNSIGNED_SHORT, sprites.ghost.offset * 2)
   }
@@ -387,19 +383,21 @@ const Drawing = function(canvas) {
 
     gl.drawElements(gl.TRIANGLES, level.indexBufferLength, gl.UNSIGNED_SHORT, level.indexBufferOffset * 2)
 
-    for (s of level.switches) {
+    for (const s of level.switches) {
       if (s.pressed) {
-        mat4.translate(viewMatrix, viewMatrix, [0, 2 * scale, 0])
+        mat4Translate(viewMatrix, 0, 2 * scale, 0)
         gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
       }
       gl.drawElements(gl.TRIANGLES, s.indexBufferLength, gl.UNSIGNED_SHORT, s.indexBufferOffset * 2)
       if (s.pressed) {
-        mat4.translate(viewMatrix, viewMatrix, [0, -2 * scale, 0])
+        mat4Translate(viewMatrix, 0, -2 * scale, 0)
         gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
       }
     }
-    for (d of level.doors) {
-      if (d.open) continue
+    for (const d of level.doors) {
+      if (d.open) {
+        continue
+      }
       gl.drawElements(gl.TRIANGLES, d.indexBufferLength, gl.UNSIGNED_SHORT, d.indexBufferOffset * 2)
     }
   }

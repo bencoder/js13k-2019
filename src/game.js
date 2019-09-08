@@ -69,7 +69,7 @@ function Game(levels) {
       }
       Draw.scale /= 0.95
       player.forceMove(mv)
-      if (currentTick == 0) {
+      if (currentTick === 0) {
         reset()
       }
       return

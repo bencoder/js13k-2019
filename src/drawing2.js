@@ -13,7 +13,7 @@ const Drawing = function(canvas) {
     [255, 231, 0],
     [0, 30, 255],
     [255, 0, 0],
-    [255, 0, 255]
+    [0, 0, 255]
   ].map(c => c.map(v => v / 255))
 
   const sprites = {
@@ -352,6 +352,7 @@ const Drawing = function(canvas) {
     mat4RotateY(viewMatrix, -Math.atan2(-ghost.movementVector.y, ghost.movementVector.x) + Math.PI / 2)
     gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
     gl.drawElements(gl.TRIANGLES, sprites.ghost.length, gl.UNSIGNED_SHORT, sprites.ghost.offset * 2)
+    return true
   }
 
   this.level = level => {

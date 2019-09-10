@@ -25,7 +25,9 @@ function Player(level) {
     if (buttons.right) {
       movement.x += Settings.playerSpeed
     }
-    this.drawMovementVector = movement;
+    if (movement.x || movement.y) {
+      this.drawMovementVector = movement;
+    }
 
     this.movementVector = level.interact(this.position, Settings.playerRadius, movement)
     this.position = this.position.add(this.movementVector)

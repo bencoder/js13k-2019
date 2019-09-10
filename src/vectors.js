@@ -1,13 +1,52 @@
-function Vec2(x, y) {
-  this.x = x
-  this.y = y
-  this.add = v => new Vec2(this.x + v.x, this.y + v.y)
-  this.sub = v => new Vec2(this.x - v.x, this.y - v.y)
-  this.len = () => Math.sqrt(this.x * this.x + this.y * this.y)
-  this.mul = n => new Vec2(this.x * n, this.y * n)
-  this.normal = () => new Vec2(-this.y / this.len(), this.x / this.len())
-  this.copy = () => new Vec2(this.x, this.y)
+const defineArrayAliases = (names, Class) => {
+  for (let i = 0; i < names.length; ++i) {
+    Object.defineProperty(Class.prototype, names[i], {
+      get() {
+        return this[i]
+      },
+      set(value) {
+        this[i] = value
+      }
+    })
+  }
 }
+
+class Vec2 extends Array {
+  constructor(x, y) {
+    super(2)
+    this.x = x
+    this.y = y
+  }
+
+  add(v) {
+    return new Vec2(this.x + v.x, this.y + v.y)
+  }
+
+  sub(v) {
+    return new Vec2(this.x - v.x, this.y - v.y)
+  }
+
+  len() {
+    const { x, y } = this
+    return Math.sqrt(x * x + y * y)
+  }
+
+  mul(n) {
+    return new Vec2(this.x * n, this.y * n)
+  }
+
+  normal() {
+    const { x, y } = this
+    const l = Math.sqrt(x * x + y * y)
+    return new Vec2(-y / l, x / l)
+  }
+
+  copy() {
+    return new Vec2(this.x, this.y)
+  }
+}
+
+defineArrayAliases(['x', 'y'], Vec2)
 
 const Vec3 = {
   add: (p1, p2) => [p1[0] + p2[0], p1[1] + p2[1], p1[2] + p2[2]],

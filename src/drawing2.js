@@ -4,6 +4,12 @@ const Drawing = function(canvas) {
 
   //const textures = getTextures(gl)
 
+  const hexagonPoints = []
+  for (let i = 0; i < 6; ++i) {
+    const angle = (i / 6) * 2 * Math.PI
+    hexagonPoints.push([Math.sin(angle), Math.cos(angle)])
+  }
+
   const scale = 1 / 100
   const pallette = [
     [0, 0, 0],
@@ -60,6 +66,27 @@ const Drawing = function(canvas) {
       makeTriangle(v1, v2, v3, c)
     }
 
+    const makePolygon = (vec2s, y, color) => {
+      const a = vec2s[0]
+      let b = vec2s[1]
+      for (let i = 2; i < vec2s.length; ++i) {
+        const c = vec2s[i]
+        makeTriangle([a[0], y, a[1]], [b[0], y, b[1]], [c[0], y, c[1]], color)
+        b = c
+      }
+    }
+
+    const makeHexagon = (centerX, centerZ, radius, y0, y1, c, c2 = c) => {
+      const pts = hexagonPoints.map(p => [p[0] * radius + centerX, p[1] * radius + centerZ])
+      makePolygon(pts, y0, c)
+      for (let i0 = 0; i0 < 6; ++i0) {
+        const i1 = (i0 + 1) % 6
+        const a = pts[i0]
+        const b = pts[i1]
+        makeQuad2([a[0], y1, a[1]], [b[0], y1, b[1]], [b[0], y0, b[1]], [a[0], y0, a[1]], c2)
+      }
+    }
+
     //b and t are each 4 vertexes, anticlockwise (when looking from above) for bottom and top of the shape
     const makeFrustrum = (b, t, c, c2) => {
       const offset = indices.length
@@ -78,7 +105,6 @@ const Drawing = function(canvas) {
 
       const walls = level.walls
       for (const poly of walls) {
-        let perimeter0 = 0
         for (let i = 0; i < poly.length; ++i) {
           const poly0 = poly[i]
           const poly1 = poly[(i + 1) % poly.length]
@@ -96,11 +122,6 @@ const Drawing = function(canvas) {
 
           const nx = -zlen / segmentLength
           const nz = xlen / segmentLength
-
-          const perimeter1 = perimeter0 + segmentLength
-
-          const verticalNormal = [-nx, 0, nz]
-          const invVerticalNormal = [nx, 0, -nz]
 
           const width = 5
           const topY = -10
@@ -128,29 +149,7 @@ const Drawing = function(canvas) {
             pallette[5]
           )
 
-          const pillarBorder = [
-            a.add({ x: 5, y: 5 }), //front-right
-            a.add({ x: 5, y: -5 }), //back-right
-            a.add({ x: -5, y: -5 }), //back-left
-            a.add({ x: -5, y: 5 }) //front-left
-          ]
-          makeFrustrum(
-            [
-              [pillarBorder[0].x, deepdown, pillarBorder[0].y],
-              [pillarBorder[1].x, deepdown, pillarBorder[1].y],
-              [pillarBorder[2].x, deepdown, pillarBorder[2].y],
-              [pillarBorder[3].x, deepdown, pillarBorder[3].y]
-            ],
-            [
-              [pillarBorder[0].x, topY - 1, pillarBorder[0].y],
-              [pillarBorder[1].x, topY - 1, pillarBorder[1].y],
-              [pillarBorder[2].x, topY - 1, pillarBorder[2].y],
-              [pillarBorder[3].x, topY - 1, pillarBorder[3].y]
-            ],
-            pallette[2]
-          )
-
-          perimeter0 = perimeter1
+          makeHexagon(a.x, a.y, 6, topY - 2, deepdown, pallette[2])
         }
       }
 
@@ -159,11 +158,7 @@ const Drawing = function(canvas) {
         let b = pts[1]
         for (let i = 2; i < pts.length; ++i) {
           const c = pts[i]
-          indices.push(
-            getVertex([a.x, 1, a.y], pallette[4]),
-            getVertex([b.x, 1, b.y], pallette[4]),
-            getVertex([c.x, 1, c.y], pallette[4])
-          )
+          makeTriangle([a.x, 1, a.y], [b.x, 1, b.y], [c.x, 1, c.y], pallette[4])
           b = c
         }
       }
@@ -172,24 +167,11 @@ const Drawing = function(canvas) {
       level.indexBufferLength = indices.length - indexBufferOffset
 
       const switchSize = 25
-      const switchTop = -2
+      const switchTop = -4
       for (const s of level.switches) {
-        const p = new Vec2(s.x, s.y)
-        const bottom = [
-          [s.x + switchSize, 1, s.y + switchSize],
-          [s.x + switchSize, 1, s.y - switchSize],
-          [s.x - switchSize, 1, s.y - switchSize],
-          [s.x - switchSize, 1, s.y + switchSize]
-        ]
-        const top = [
-          [s.x + switchSize, switchTop, s.y + switchSize],
-          [s.x + switchSize, switchTop, s.y - switchSize],
-          [s.x - switchSize, switchTop, s.y - switchSize],
-          [s.x - switchSize, switchTop, s.y + switchSize]
-        ]
-        const [o, l] = makeFrustrum(bottom, top, pallette[5], pallette[0])
-        s.indexBufferOffset = o
-        s.indexBufferLength = l
+        s.indexBufferOffset = indices.length
+        makeHexagon(s.x, s.y, switchSize, switchTop, 0, pallette[5], pallette[0])
+        s.indexBufferLength = indices.length - s.indexBufferOffset
       }
 
       for (const d of level.doors) {

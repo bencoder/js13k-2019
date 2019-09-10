@@ -13,13 +13,11 @@ const Drawing = function(canvas) {
   const scale = 1 / 100
 
   const COLOR_DEEP_WALLS = colour(0, 50, 100)
-
-  const COLOR_SMALL_WALLS = colour(0, 100, 255)
   const COLOR_PILLARS = colour(0, 80, 230)
-
+  const COLOR_SMALL_WALLS = colour(0, 100, 255)
   const COLOR_GROUND = colour(20, 60, 170)
   const COLOR_BUTTON = colour(100, 0, 0)
-  const COLOR_BUTTON_SIDE = colour(0, 0, 50)
+  const COLOR_BUTTON_SIDE = colour(50, 0, 0)
   const COLOR_DOOR = colour(255, 0, 0)
   const COLOR_DOOR_SIDE = colour(100, 100, 100)
 
@@ -380,12 +378,12 @@ const Drawing = function(canvas) {
 
     for (const s of level.switches) {
       if (s.pressed) {
-        mat4Translate(viewMatrix, 0, 2 * scale, 0)
+        mat4Translate(viewMatrix, 0, 4 * scale, 0)
         gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
       }
       gl.drawElements(gl.TRIANGLES, s.indexBufferLength, gl.UNSIGNED_SHORT, s.indexBufferOffset * 2)
       if (s.pressed) {
-        mat4Translate(viewMatrix, 0, -2 * scale, 0)
+        mat4Translate(viewMatrix, 0, -4 * scale, 0)
         gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
       }
     }

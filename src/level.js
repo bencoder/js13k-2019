@@ -58,7 +58,7 @@ function Level(levelObject) {
         }
         s.pressed++
       }
-      if (wasTouching && !nowTouching) {
+      if (wasTouching && !nowTouching && s.type !== 'single') {
         s.pressed--
       }
       if (wasTouching && !nowTouching && s.type === 'momentary' && s.pressed === 0) {
@@ -80,7 +80,7 @@ function Level(levelObject) {
     for (const s of currentLevel.switches) {
       const isTouching = position.sub(new Vec2(s.x, s.y)).len() < radius + Settings.switchRadius
       if (isTouching) {
-        s.pressed--
+        if (s.type !== 'single') s.pressed--
         if (s.pressed === 0 && s.type === 'momentary') {
           for (const target of s.targets) {
             toggleDoor(target)

@@ -324,6 +324,116 @@ const levels = [
     id: 3,
     walls: [
       [
+        { x: 416, y: 832 },
+        { x: 480, y: 832 },
+        { x: 480, y: 672 },
+        { x: 576, y: 672 },
+        { x: 576, y: 608 },
+        { x: 480, y: 608 },
+        { x: 480, y: 320 },
+        { x: 416, y: 320 },
+        { x: 416, y: 608 },
+        { x: 320, y: 608 },
+        { x: 320, y: 672 },
+        { x: 416, y: 672 },
+        { x: 416, y: 832 }
+      ]
+    ],
+    polys: [
+      [
+        { x: 416, y: 608 },
+        { x: 320, y: 608 },
+        { x: 320, y: 672 },
+        { x: 416, y: 672 }
+      ],
+      [
+        { x: 480, y: 672 },
+        { x: 576, y: 672 },
+        { x: 576, y: 608 },
+        { x: 480, y: 608 }
+      ],
+      [
+        { x: 480, y: 832 },
+        { x: 480, y: 672 },
+        { x: 480, y: 608 },
+        { x: 480, y: 320 },
+        { x: 416, y: 320 },
+        { x: 416, y: 608 },
+        { x: 416, y: 672 },
+        { x: 416, y: 832 }
+      ]
+    ],
+    doors: [
+      {
+        name: "door1",
+        polygon: [{ x: 416, y: 608 }, { x: 480, y: 608 }, { x: 416, y: 608 }],
+        open: false
+      },
+      {
+        name: "door2",
+        polygon: [{ x: 416, y: 544 }, { x: 480, y: 544 }, { x: 416, y: 544 }],
+        open: false
+      },
+      {
+        name: "door3",
+        polygon: [{ x: 416, y: 480 }, { x: 480, y: 480 }, { x: 416, y: 480 }],
+        open: false
+      },
+      {
+        name: "door4",
+        polygon: [{ x: 416, y: 416 }, { x: 480, y: 416 }, { x: 416, y: 416 }],
+        open: false
+      }
+    ],
+    switches: [
+      {
+        x: 352,
+        y: 640,
+        name: "switch1",
+        targets: ["door1", "door3"],
+        type: "momentary",
+        pressed: 0
+      },
+      {
+        x: 416,
+        y: 640,
+        name: "switch2",
+        targets: ["door3", "door4"],
+        type: "momentary",
+        pressed: 0
+      },
+      {
+        x: 480,
+        y: 640,
+        name: "switch3",
+        targets: ["door1", "door2"],
+        type: "momentary",
+        pressed: 0
+      },
+      {
+        x: 544,
+        y: 640,
+        name: "switch4",
+        targets: ["door2", "door3"],
+        type: "momentary",
+        pressed: 0
+      },
+      {
+        x: 448,
+        y: 448,
+        name: "switch5",
+        targets: ["door4"],
+        type: "single",
+        pressed: 0
+      }
+    ],
+    start: { x: 448, y: 800 },
+    end: { x: 448, y: 352 }
+  },
+  {
+    id: 4,
+    walls: [
+      [
         { x: 416, y: 960 },
         { x: 480, y: 960 },
         { x: 480, y: 288 },
@@ -464,107 +574,5 @@ const levels = [
     ],
     start: { x: 448, y: 736 },
     end: { x: 576, y: 736 }
-  },
-  {
-    id: 4,
-    walls: [
-      [
-        { x: 416, y: 832 },
-        { x: 480, y: 832 },
-        { x: 480, y: 672 },
-        { x: 576, y: 672 },
-        { x: 576, y: 608 },
-        { x: 480, y: 608 },
-        { x: 480, y: 320 },
-        { x: 416, y: 320 },
-        { x: 416, y: 608 },
-        { x: 320, y: 608 },
-        { x: 320, y: 672 },
-        { x: 416, y: 672 },
-        { x: 416, y: 832 }
-      ]
-    ],
-    polys: [
-      [
-        { x: 416, y: 608 },
-        { x: 320, y: 608 },
-        { x: 320, y: 672 },
-        { x: 416, y: 672 }
-      ],
-      [
-        { x: 480, y: 672 },
-        { x: 576, y: 672 },
-        { x: 576, y: 608 },
-        { x: 480, y: 608 }
-      ],
-      [
-        { x: 480, y: 832 },
-        { x: 480, y: 672 },
-        { x: 480, y: 608 },
-        { x: 480, y: 320 },
-        { x: 416, y: 320 },
-        { x: 416, y: 608 },
-        { x: 416, y: 672 },
-        { x: 416, y: 832 }
-      ]
-    ],
-    doors: [
-      {
-        name: "door1",
-        polygon: [{ x: 416, y: 608 }, { x: 480, y: 608 }, { x: 416, y: 608 }],
-        open: false
-      },
-      {
-        name: "door2",
-        polygon: [{ x: 416, y: 544 }, { x: 480, y: 544 }, { x: 416, y: 544 }],
-        open: false
-      },
-      {
-        name: "door3",
-        polygon: [{ x: 416, y: 480 }, { x: 480, y: 480 }, { x: 416, y: 480 }],
-        open: false
-      },
-      {
-        name: "door4",
-        polygon: [{ x: 416, y: 416 }, { x: 480, y: 416 }, { x: 416, y: 416 }],
-        open: false
-      }
-    ],
-    switches: [
-      {
-        x: 352,
-        y: 640,
-        name: "switch1",
-        targets: ["door1", "door3"],
-        type: "momentary",
-        pressed: 0
-      },
-      {
-        x: 416,
-        y: 640,
-        name: "switch2",
-        targets: ["door3", "door4"],
-        type: "momentary",
-        pressed: 0
-      },
-      {
-        x: 480,
-        y: 640,
-        name: "switch3",
-        targets: ["door1", "door2"],
-        type: "momentary",
-        pressed: 0
-      },
-      {
-        x: 544,
-        y: 640,
-        name: "switch4",
-        targets: ["door2", "door3"],
-        type: "momentary",
-        pressed: 0
-      }
-    ],
-    start: { x: 448, y: 800 },
-    end: { x: 448, y: 352 }
   }
 ];

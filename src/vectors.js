@@ -1,19 +1,9 @@
-const defineArrayAliases = (names, Class) => {
-  for (let i = 0; i < names.length; ++i) {
-    Object.defineProperty(Class.prototype, names[i], {
-      get() {
-        return this[i]
-      },
-      set(value) {
-        this[i] = value
-      }
-    })
-  }
+function colour(r, g, b) {
+  return [r / 255, g / 255, b / 255]
 }
 
-class Vec2 extends Array {
+class Vec2 {
   constructor(x, y) {
-    super(2)
     this.x = x
     this.y = y
   }
@@ -36,17 +26,14 @@ class Vec2 extends Array {
   }
 
   normal() {
-    const { x, y } = this
-    const l = Math.sqrt(x * x + y * y)
-    return new Vec2(-y / l, x / l)
+    const len = this.len()
+    return new Vec2(-this.y / len, this.x / len)
   }
 
   copy() {
     return new Vec2(this.x, this.y)
   }
 }
-
-defineArrayAliases(['x', 'y'], Vec2)
 
 const Vec3 = {
   add: (p1, p2) => [p1[0] + p2[0], p1[1] + p2[1], p1[2] + p2[2]],

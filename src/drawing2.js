@@ -11,16 +11,15 @@ const Drawing = function(canvas) {
   }
 
   const scale = 1 / 100
-  const pallette = [
-    [0, 0, 0],
-    [77, 238, 234],
-    [116, 238, 21],
-    [255, 231, 0],
-    [255, 231, 0],
-    [0, 30, 255],
-    [255, 0, 0],
-    [0, 0, 255]
-  ].map(c => c.map(v => v / 255))
+
+  const COLOR_DEEP_WALLS = colour(0, 0, 255)
+  const COLOR_SMALL_WALLS = colour(0, 30, 255)
+  const COLOR_PILLARS = colour(116, 238, 21)
+  const COLOR_GROUND = colour(255, 231, 0)
+  const COLOR_BUTTON = colour(0, 30, 255)
+  const COLOR_BUTTON_SIDE = colour(0, 0, 50)
+  const COLOR_DOOR = colour(255, 0, 0)
+  const COLOR_DOOR_SIDE = colour(110, 110, 110)
 
   const sprites = {
     player: {
@@ -89,15 +88,12 @@ const Drawing = function(canvas) {
 
     //b and t are each 4 vertexes, anticlockwise (when looking from above) for bottom and top of the shape
     const makeFrustrum = (b, t, c, c2) => {
-      const offset = indices.length
       //makeQuad2(...b, c)
       makeQuad2(...t, c)
       makeQuad2(b[0], b[1], t[1], t[0], c2 || c)
       makeQuad2(b[0], t[0], t[3], b[3], c2 || c)
       makeQuad2(b[3], t[3], t[2], b[2], c2 || c)
       makeQuad2(b[2], t[2], t[1], b[1], c2 || c)
-      const length = indices.length - offset
-      return [offset, length]
     }
 
     for (const level of levels) {
@@ -129,7 +125,13 @@ const Drawing = function(canvas) {
           const deepdown = 1000
 
           // deep down
-          makeQuad2([a.x, deepdown, a.y], [b.x, deepdown, b.y], [b.x, bottomY, b.y], [a.x, bottomY, a.y], pallette[7])
+          makeQuad2(
+            [a.x, deepdown, a.y],
+            [b.x, deepdown, b.y],
+            [b.x, bottomY, b.y],
+            [a.x, bottomY, a.y],
+            COLOR_DEEP_WALLS
+          )
 
           const offset = new Vec2(nx, nz).mul(width / 2)
           const border = [a.sub(offset), b.sub(offset), b.add(offset), a.add(offset)]
@@ -146,10 +148,10 @@ const Drawing = function(canvas) {
               [border[2].x, topY, border[2].y],
               [border[3].x, topY, border[3].y]
             ],
-            pallette[5]
+            COLOR_SMALL_WALLS
           )
 
-          makeHexagon(a.x, a.y, 6, topY - 2, deepdown, pallette[2])
+          makeHexagon(a.x, a.y, 6, topY - 2, deepdown, COLOR_PILLARS)
         }
       }
 
@@ -158,8 +160,14 @@ const Drawing = function(canvas) {
         let b = pts[1]
         for (let i = 2; i < pts.length; ++i) {
           const c = pts[i]
-          makeTriangle([a.x, 1, a.y], [b.x, 1, b.y], [c.x, 1, c.y], pallette[4])
+          makeTriangle([a.x, 1, a.y], [b.x, 1, b.y], [c.x, 1, c.y], COLOR_GROUND)
           b = c
+        }
+      }
+
+      for (const d of level.doors) {
+        for (let i = 0, p = d.polygon; i < 2; ++i) {
+          makeHexagon(p[i].x, p[i].y, 5, -22, 1, COLOR_DOOR_SIDE)
         }
       }
 
@@ -170,7 +178,7 @@ const Drawing = function(canvas) {
       const switchTop = -4
       for (const s of level.switches) {
         s.indexBufferOffset = indices.length
-        makeHexagon(s.x, s.y, switchSize, switchTop, 0, pallette[5], pallette[0])
+        makeHexagon(s.x, s.y, switchSize, switchTop, 0, COLOR_BUTTON, COLOR_BUTTON_SIDE)
         s.indexBufferLength = indices.length - s.indexBufferOffset
       }
 
@@ -181,34 +189,36 @@ const Drawing = function(canvas) {
         const normal = p1.sub(p0).normal()
         const offset = normal.mul(1)
         const border = [p0.sub(offset), p1.sub(offset), p1.add(offset), p0.add(offset)]
-        const bottomY = -4
-        const topY = -6
-        const [o, l] = makeFrustrum(
-          [
-            [border[0].x, bottomY, border[0].y],
-            [border[1].x, bottomY, border[1].y],
-            [border[2].x, bottomY, border[2].y],
-            [border[3].x, bottomY, border[3].y]
-          ],
-          [
-            [border[0].x, topY, border[0].y],
-            [border[1].x, topY, border[1].y],
-            [border[2].x, topY, border[2].y],
-            [border[3].x, topY, border[3].y]
-          ],
-          pallette[6]
-        )
-        d.indexBufferOffset = o
-        d.indexBufferLength = l
+        d.indexBufferOffset = indices.length
+        for (let i = 0; i < 2; ++i) {
+          const bottomY = -4 - i * 10
+          const topY = -6 - i * 10
+          makeFrustrum(
+            [
+              [border[0].x, bottomY, border[0].y],
+              [border[1].x, bottomY, border[1].y],
+              [border[2].x, bottomY, border[2].y],
+              [border[3].x, bottomY, border[3].y]
+            ],
+            [
+              [border[0].x, topY, border[0].y],
+              [border[1].x, topY, border[1].y],
+              [border[2].x, topY, border[2].y],
+              [border[3].x, topY, border[3].y]
+            ],
+            COLOR_DOOR
+          )
+        }
+        d.indexBufferLength = indices.length - d.indexBufferOffset
       }
     }
 
     sprites.player.offset = indices.length
-    makeTriangle([0, 0, -10], [-6, 0, 5], [6, 0, 5], [255, 0, 0])
+    makeTriangle([0, -1, -10], [-6, -1, 5], [6, -1, 5], [255, 0, 0])
     sprites.player.length = indices.length - sprites.player.offset
 
     sprites.ghost.offset = indices.length
-    makeTriangle([0, 0, -10], [-6, 0, 5], [6, 0, 5], [0, 0, 0])
+    makeTriangle([0, -1, -10], [-6, -1, 5], [6, -1, 5], [0, 0, 0])
     sprites.ghost.length = indices.length - sprites.ghost.offset
 
     return {

@@ -14,7 +14,7 @@
    </properties>
    <point/>
   </object>
-  <object id="4" name="end" type="end" x="576" y="736">
+  <object id="4" name="end" type="end" x="448" y="608">
    <point/>
   </object>
   <object id="5" name="door1" type="door" x="416" y="288">

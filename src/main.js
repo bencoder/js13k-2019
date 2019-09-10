@@ -10,7 +10,7 @@ const Settings = {
 const Draw = new Drawing(document.getElementById('c'))
 const game = new Game(levels)
 
-const levelIndex = 1
+const levelIndex = 6
 game.loadLevel(levelIndex)
 
 let previous

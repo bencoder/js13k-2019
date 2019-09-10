@@ -1,12 +1,38 @@
-function Vec2(x, y) {
-  this.x = x
-  this.y = y
-  this.add = v => new Vec2(this.x + v.x, this.y + v.y)
-  this.sub = v => new Vec2(this.x - v.x, this.y - v.y)
-  this.len = () => Math.sqrt(this.x * this.x + this.y * this.y)
-  this.mul = n => new Vec2(this.x * n, this.y * n)
-  this.normal = () => new Vec2(-this.y / this.len(), this.x / this.len())
-  this.copy = () => new Vec2(this.x, this.y)
+function colour(r, g, b) {
+  return [r / 255, g / 255, b / 255]
+}
+
+class Vec2 {
+  constructor(x, y) {
+    this.x = x
+    this.y = y
+  }
+
+  add(v) {
+    return new Vec2(this.x + v.x, this.y + v.y)
+  }
+
+  sub(v) {
+    return new Vec2(this.x - v.x, this.y - v.y)
+  }
+
+  len() {
+    const { x, y } = this
+    return Math.sqrt(x * x + y * y)
+  }
+
+  mul(n) {
+    return new Vec2(this.x * n, this.y * n)
+  }
+
+  normal() {
+    const len = this.len()
+    return new Vec2(-this.y / len, this.x / len)
+  }
+
+  copy() {
+    return new Vec2(this.x, this.y)
+  }
 }
 
 const Vec3 = {

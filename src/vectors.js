@@ -17,7 +17,10 @@ class Vec2 {
   }
 
   len() {
-    const { x, y } = this
+    const {
+      x,
+      y
+    } = this
     return Math.sqrt(x * x + y * y)
   }
 
@@ -28,6 +31,11 @@ class Vec2 {
   normal() {
     const len = this.len()
     return new Vec2(-this.y / len, this.x / len)
+  }
+
+  normalize() {
+    const len = this.len()
+    return new Vec2(this.x / len, this.y / len)
   }
 
   copy() {

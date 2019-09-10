@@ -2,28 +2,38 @@ function Level(levelObject) {
   let currentLevel = JSON.parse(JSON.stringify(levelObject))
 
   const doesCircleCollide = (position, radius) => {
+
+
+    let didCollide = false
     for (let i = 0; i < currentLevel.walls.length; i++) {
       for (let j = 1; j < currentLevel.walls[i].length; j++) {
-        if (doesLineInterceptCircle(currentLevel.walls[i][j - 1], currentLevel.walls[i][j], position, radius)) {
-          return true
+        const colPos = doesLineInterceptCircle(currentLevel.walls[i][j - 1], currentLevel.walls[i][j], position, radius)
+        if (colPos) {
+          position = colPos
+          i = -1;
+          didCollide = true
+          break
         }
       }
     }
+
     for (let i = 0; i < currentLevel.doors.length; i++) {
-      for (let j = 1; j < currentLevel.doors[i].polygon.length; j++) {
-        if (
-          !currentLevel.doors[i].open &&
-          doesLineInterceptCircle(
-            currentLevel.doors[i].polygon[j - 1],
-            currentLevel.doors[i].polygon[j],
-            position,
-            radius
-          )
-        ) {
-          return true
-        }
+      if (currentLevel.doors[i].open) {
+        continue
+      }
+      const colPos = doesLineInterceptCircle(
+        currentLevel.doors[i].polygon[0],
+        currentLevel.doors[i].polygon[1],
+        position,
+        radius
+      );
+      if (colPos) {
+        return colPos
       }
     }
+
+    if (didCollide) return position
+
     return false
   }
 
@@ -88,14 +98,15 @@ function Level(levelObject) {
 
   this.interact = (oldPos, radius, plannedVector) => {
     const newPos = oldPos.add(plannedVector)
-
-    if (doesCircleCollide(newPos, radius)) {
-      return new Vec2(0, 0)
-    }
+    const collisionPosition = doesCircleCollide(newPos, radius)
 
     handleSwitches(oldPos, newPos, radius)
 
     handleEnd(newPos, radius)
+
+    if (collisionPosition) {
+      return collisionPosition.sub(oldPos)
+    }
 
     return plannedVector
   }

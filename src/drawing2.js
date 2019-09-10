@@ -12,14 +12,16 @@ const Drawing = function(canvas) {
 
   const scale = 1 / 100
 
-  const COLOR_DEEP_WALLS = colour(0, 0, 255)
-  const COLOR_SMALL_WALLS = colour(0, 30, 255)
-  const COLOR_PILLARS = colour(116, 238, 21)
-  const COLOR_GROUND = colour(255, 231, 0)
-  const COLOR_BUTTON = colour(0, 30, 255)
+  const COLOR_DEEP_WALLS = colour(0, 50, 100)
+
+  const COLOR_SMALL_WALLS = colour(0, 100, 255)
+  const COLOR_PILLARS = colour(0, 80, 230)
+
+  const COLOR_GROUND = colour(20, 60, 170)
+  const COLOR_BUTTON = colour(100, 0, 0)
   const COLOR_BUTTON_SIDE = colour(0, 0, 50)
   const COLOR_DOOR = colour(255, 0, 0)
-  const COLOR_DOOR_SIDE = colour(110, 110, 110)
+  const COLOR_DOOR_SIDE = colour(100, 100, 100)
 
   const sprites = {
     player: {

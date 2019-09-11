@@ -25,11 +25,13 @@ function Player(level) {
     if (buttons.right) {
       movement.x += Settings.playerSpeed
     }
+    if (movement.x || movement.y) {
+      this.drawMovementVector = movement;
+    }
 
     this.movementVector = level.interact(this.position, Settings.playerRadius, movement)
     this.position = this.position.add(this.movementVector)
     if (this.movementVector.x != 0 || this.movementVector.y != 0) {
-      this.drawMovementVector = this.movementVector
       Sounds.step()
     }
 

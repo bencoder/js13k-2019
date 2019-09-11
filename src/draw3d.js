@@ -122,12 +122,11 @@ const Drawing = function(canvas) {
       }
 
       if (timerS !== s) {
+        timerS = s
         if (s < 4) {
           timerX = 1
           Telement.className = 'x'
         }
-        console.log('TIME')
-        timerS = s
         Telement.innerText = s
       }
     }

@@ -88,15 +88,49 @@ const Drawing = function(canvas) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
   }
 
-  this.timer = time => {
-    const r = 255
-    const b = floor(255 * (1 - time / settings_timeToDie))
+  let timerUpdateTime = 0
 
-    // TODO:
-    Telement.innerText = time.toFixed(1)
-    //ctx.fillStyle = `rgb(${r},${b},${b})`
-    //ctx.font = '48px serif'
-    //ctx.fillText(time.toFixed(1), 10, 40)
+  let timerR = 0
+  let timerG = 0
+  let timerS = 0
+  let timerX = 0
+
+  this.timer = time => {
+    const t = 1 - time / settings_timeToDie
+
+    const s = Math.ceil(13 - time)
+
+    if (timerS !== s || time - timerUpdateTime > 0.2) {
+      if (timerX) {
+        Telement.className = ''
+      }
+
+      timerUpdateTime = time
+
+      let v = new Vec2(t, 1 - t)
+      v = v.normalize()
+
+      const r = round(255 * v.y)
+      const g = round(255 * v.x)
+
+      if (r !== timerR || g !== timerG) {
+        timerR = r
+        timerG = g
+
+        const b = round(128 * v.x * v.x)
+        Telement.style.color = `rgb(${r},${g},${b})`
+      }
+
+      if (timerS !== s) {
+        if (s < 4) {
+          timerX = 1
+          Telement.className = 'x'
+        }
+        console.log('TIME')
+        timerS = s
+        Telement.innerText = s
+      }
+    }
   }
 
   let timeDelta = 1

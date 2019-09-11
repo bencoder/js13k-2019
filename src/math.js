@@ -1,4 +1,4 @@
-const { sin, cos, tan, hypot, atan2, sqrt, abs, floor, PI } = Math
+const { sin, cos, tan, hypot, atan2, sqrt, abs, floor, round, PI } = Math
 const PI2 = PI * 2
 
 const colour = (r, g, b) => [r / 255, g / 255, b / 255]

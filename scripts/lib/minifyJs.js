@@ -35,7 +35,7 @@ function getOptions() {
       dead_code: true,
       drop_console: true,
       drop_debugger: true,
-      ecma: 8,
+      ecma: 9,
       evaluate: true,
       expression: true,
       global_defs: {},
@@ -87,7 +87,7 @@ function getOptions() {
       toplevel: false
     },
     output: {
-      ascii_only: false,
+      ascii_only: true,
       beautify: false,
       bracketize: false,
       comments: /@license|@preserve|^!/,

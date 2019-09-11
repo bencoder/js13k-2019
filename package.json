@@ -36,5 +36,7 @@
     "prettysize": "^2.0.0",
     "uglify-es": "^3.3.9"
   },
-  "dependencies": {}
+  "dependencies": {
+    "csso": "^3.5.1"
+  }
 }

@@ -8,6 +8,7 @@ const minifyHtml = require('./lib/minifyHtml')
 const minifyJs = require('./lib/minifyJs')
 const humanReadableFileSize = require('./lib/humanReadableFileSize')
 const { getUsedBrowserGlobals } = require('./lib/browserGlobals')
+const csso = require('csso')
 
 const rootFolder = path.resolve(__dirname, '../')
 const srcFolder = path.resolve(rootFolder, 'src')
@@ -18,7 +19,8 @@ const outZipPath = path.resolve(outFolder, 'out.zip')
 
 const options = {
   minifyJs: true,
-  minifyHtml: true
+  minifyHtml: false,
+  minifyCss: true
 }
 
 function mergeScriptFiles(filenames) {
@@ -48,13 +50,24 @@ async function build() {
     .map(x => x.attribs.src)
     .filter(x => x)
 
+  const cssLinks = $("link[type$='text/css']")
+
   console.log()
   console.log('----- input -----')
   console.log(`JavaSript files : ${scriptFiles.length}`)
+  console.log(`CSS files       : ${cssLinks.length}`)
 
   let mergedJs = mergeScriptFiles(scriptFiles)
 
-  console.log('Input total size:', humanReadableFileSize(inputHtmlText.length + mergedJs.length))
+  let css = ''
+  cssLinks.each((i, x) => {
+    const href = $(x).attr('href')
+    if (href) {
+      css += `${fs.readFileSync(path.resolve(srcFolder, href))}\n`
+    }
+  })
+
+  console.log('Input total size:', humanReadableFileSize(Buffer.from(inputHtmlText + mergedJs + css).length))
   console.log()
 
   if (options.minifyJs) {
@@ -62,9 +75,21 @@ async function build() {
     const usedGlobals = getUsedBrowserGlobals(mergedJs).join(',')
     console.log('Used globals: ', usedGlobals)
     mergedJs = `((${usedGlobals})=>{${mergedJs}})(${usedGlobals})`
+    mergedJs = `'use strict';${mergedJs}`
     mergedJs = minifyJs(mergedJs)
   } else {
-    mergedJs = `(()=>{${mergedJs}})()`
+    mergedJs = `(()=>{'use strict';${mergedJs}})()`
+  }
+
+  cssLinks.remove()
+
+  if (css) {
+    if (options.minifyCss) {
+      css = csso.minify(css, { comments: false }).css
+    }
+    if (css) {
+      $('head').append($('<style></style>').text(css))
+    }
   }
 
   $('<script></script>')
@@ -113,4 +138,4 @@ function zipOutFile(outHtmlText) {
   })
 }
 
-runPromise(build(), 'build')
+runPromise(build, 'build')

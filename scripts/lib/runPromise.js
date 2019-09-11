@@ -1,6 +1,6 @@
-function runPromise(promise, name) {
+function runPromise(func, name) {
   console.time(name)
-  return promise
+  return func()
     .then(() => console.timeEnd(name))
     .catch(e => {
       console.error(e)

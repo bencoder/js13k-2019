@@ -1,62 +1,30 @@
-<style>
-  * {
-    user-select: none;
-  }
+<html>
 
-  body {
-    background: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+<head>
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+</head>
 
-  main {
-    position: relative;
-  }
+<body>
+  <main>
+    <div id="T">&nbsp;</div>
+    <canvas id="c" width="900" height="600"></canvas>
+  </main>
+  <script src="math.js"></script>
+  <script src="settings.js"></script>
+  <script src="jsfxr.min.js"></script>
+  <script src="shaders.js"></script>
+  <script src="levels.js"></script>
+  <script src="sound.js"></script>
+  <script src="vectors.js"></script>
+  <script src="mat4.js"></script>
+  <script src="collision.js"></script>
+  <script src="build3d.js"></script>
+  <script src="draw3d.js"></script>
+  <script src="player.js"></script>
+  <script src="ghost.js"></script>
+  <script src="level.js"></script>
+  <script src="game.js"></script>
+  <script src="main.js"></script>
+</body>
 
-  #T {
-    position: absolute;
-    font-family: monospace;
-    bottom: 0;
-    margin: 10px;
-    border-radius: 10px;
-    padding: 15px;
-    width: 70px;
-    line-height: 70px;
-    font-size: 60px;
-    text-align: center;
-    transition: color 150ms linear, background-color 300ms linear;
-    background: rgba(20, 0, 40, 0.3);
-    border: 1px solid rgba(20, 0, 40, 0.3);
-    text-shadow: 1px 1px 3px #000;
-  }
-
-  #T.x {
-    background: red
-  }
-
-  #c {
-    padding: 0;
-    display: block;
-  }
-</style>
-<main>
-  <div id="T">&nbsp;</div>
-  <canvas id="c" width="900" height="600"></canvas>
-</main>
-<script src="math.js"></script>
-<script src="settings.js"></script>
-<script src="jsfxr.min.js"></script>
-<script src="shaders.js"></script>
-<script src="levels.js"></script>
-<script src="sound.js"></script>
-<script src="vectors.js"></script>
-<script src="mat4.js"></script>
-<script src="collision.js"></script>
-<script src="build3d.js"></script>
-<script src="draw3d.js"></script>
-<script src="player.js"></script>
-<script src="ghost.js"></script>
-<script src="level.js"></script>
-<script src="game.js"></script>
-<script src="main.js"></script>
+</html>

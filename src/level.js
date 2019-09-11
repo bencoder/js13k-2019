@@ -40,11 +40,6 @@ function Level(levelObject) {
   const toggleDoor = doorName => {
     const door = currentLevel.doors.find(d => d.name === doorName)
     door.open = !door.open
-    if (door.open) {
-      Sounds.doorOpen()
-    } else {
-      Sounds.doorClose()
-    }
   }
 
   const handleSwitches = (oldPos, newPos, radius) => {
@@ -58,6 +53,7 @@ function Level(levelObject) {
           for (const target of s.targets) {
             toggleDoor(target)
           }
+          Sounds.switchDown()
         }
         s.pressed++
       }
@@ -68,6 +64,9 @@ function Level(levelObject) {
         for (const target of s.targets) {
           toggleDoor(target)
         }
+      }
+      if (wasTouching && !nowTouching && s.pressed === 0) {
+        Sounds.switchUp()
       }
     }
   }

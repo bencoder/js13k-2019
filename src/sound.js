@@ -1,62 +1,14 @@
 const footstep = new Audio(
   jsfxr([0, , 0.1074, , 0.0725, 0.589, , -0.911, 0.0889, , , 0.533, , 0.5665, , , 0.5549, , 0.389, 0.867, , , , 0.5])
 )
-const doorOpen = new Audio(
-  jsfxr([
-    1,
-    0.361,
-    0.01,
-    ,
-    0.3835,
-    0.8165,
-    0.472,
-    -0.3,
-    -0.0109,
-    ,
-    ,
-    ,
-    ,
-    0.1925,
-    0.111,
-    ,
-    -0.0109,
-    0.056,
-    1,
-    ,
-    ,
-    ,
-    ,
-    0.5
-  ])
+const switchDown = new Audio(
+  jsfxr([2, 0.0102, 0.066, 0.539, 0.1037, 0.2835, , -0.189, -0.322, , , 0.8999, , , , , , , 1, , , , , 0.5])
 )
-const doorClose = new Audio(
-  jsfxr([
-    1,
-    0.228,
-    0.01,
-    ,
-    0.1835,
-    0.428,
-    0.3835,
-    0.189,
-    -0.0109,
-    ,
-    ,
-    ,
-    ,
-    0.1925,
-    0.111,
-    ,
-    0.0329,
-    0.056,
-    0.539,
-    ,
-    0.272,
-    0.1055,
-    -0.4329,
-    0.5
-  ])
+const switchUp = new Audio(
+  jsfxr([2, 0.0102, 0.066, 0.539, 0.1037, 0.239, , -0.189, -0.322, , , 0.8999, , , , , , , 1, , , , , 0.5])
 )
+switchDown.volume = 0.5
+switchUp.volume = 0.5
 
 const death = new Audio(
   jsfxr([1, , 0.2711, , 0.3143, 0.511, , 0.1779, -0.267, 0.2011, 0.4152, , , , , , , , 1, -0.045, , , , 0.5])
@@ -76,11 +28,11 @@ const Sounds = {
       setTimeout(() => (footstepPlaying = false), 250)
     }
   },
-  doorOpen() {
-    doorOpen.play()
+  switchDown() {
+    switchDown.play()
   },
-  doorClose() {
-    doorClose.play()
+  switchUp() {
+    switchUp.play()
   },
   death() {
     //death.play()

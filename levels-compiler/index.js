@@ -2,7 +2,7 @@
 
 const path = require('path')
 const fs = require('fs')
-const tmxToLevel = require('./tmxToLevel')
+const TmxToLevelConverter = require('./TmxToLevelConverter')
 const prettier = require('prettier')
 
 const levelsFolder = path.resolve(__dirname, '../levels')
@@ -17,11 +17,12 @@ const levelNames = fs
 console.log(`Compiling ${levelNames.length} levels from ${levelsFolder} to ${outputLevelsFilePath}`)
 
 const levels = []
+const tmxToLevelConverter = new TmxToLevelConverter()
 for (let levelIndex = 0; levelIndex < levelNames.length; ++levelIndex) {
   const levelName = levelNames[levelIndex]
   console.log('>', levelIndex, levelName)
   const xml = fs.readFileSync(path.resolve(levelsFolder, `${levelName}.tmx`), 'utf8')
-  const level = tmxToLevel(xml, levelIndex)
+  const level = tmxToLevelConverter.tmxToLevel(xml, levelIndex)
   levels.push(level)
 }
 

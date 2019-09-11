@@ -46,9 +46,9 @@ const levels = [
     ],
     switches: [
       {
+        uid: 0,
         x: 448,
         y: 480,
-        name: "switch1",
         targets: ["door1"],
         type: "momentary",
         pressed: 0
@@ -185,17 +185,17 @@ const levels = [
     ],
     switches: [
       {
+        uid: 1,
         x: 768,
         y: 672,
-        name: "switch1",
         targets: ["door1"],
         type: "momentary",
         pressed: 0
       },
       {
+        uid: 2,
         x: 640,
         y: 672,
-        name: "switch2",
         targets: ["door2"],
         type: "momentary",
         pressed: 0
@@ -301,21 +301,14 @@ const levels = [
     ],
     switches: [
       {
+        uid: 3,
         x: 352,
         y: 512,
-        name: "switch",
         targets: ["door2"],
         type: "momentary",
         pressed: 0
       },
-      {
-        x: 769,
-        y: 702,
-        name: "switch1",
-        targets: ["door1"],
-        type: "toggle",
-        pressed: 0
-      }
+      { uid: 4, x: 769, y: 702, targets: ["door1"], type: "toggle", pressed: 0 }
     ],
     start: { x: 480, y: 928 },
     end: { x: 480, y: 288 }
@@ -438,25 +431,25 @@ const levels = [
     ],
     switches: [
       {
+        uid: 5,
         x: 448,
         y: 480,
-        name: "switch1",
         targets: ["door1"],
         type: "momentary",
         pressed: 0
       },
       {
+        uid: 6,
         x: 320,
         y: 736,
-        name: "switch1",
         targets: ["door1"],
         type: "momentary",
         pressed: 0
       },
       {
+        uid: 7,
         x: 448,
         y: 576,
-        name: "switch1",
         targets: ["door1"],
         type: "momentary",
         pressed: 0
@@ -532,33 +525,33 @@ const levels = [
     ],
     switches: [
       {
+        uid: 8,
         x: 352,
         y: 640,
-        name: "switch1",
         targets: ["door1", "door3"],
         type: "momentary",
         pressed: 0
       },
       {
+        uid: 9,
         x: 416,
         y: 640,
-        name: "switch2",
         targets: ["door3", "door4"],
         type: "momentary",
         pressed: 0
       },
       {
+        uid: 10,
         x: 480,
         y: 640,
-        name: "switch3",
         targets: ["door1", "door2"],
         type: "momentary",
         pressed: 0
       },
       {
+        uid: 11,
         x: 544,
         y: 640,
-        name: "switch4",
         targets: ["door2", "door3"],
         type: "momentary",
         pressed: 0

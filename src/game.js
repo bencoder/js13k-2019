@@ -37,7 +37,7 @@ function Game(levels) {
     state = STATE_DEAD
   }
 
-  this.draw = accumulator => {
+  this.draw = (accumulator, frameTime, timeDelta) => {
     Draw.accumulator = accumulator
     switch (state) {
       case STATE_TITLE:
@@ -47,7 +47,7 @@ function Game(levels) {
       case STATE_PLAY:
         Draw.setCamera(player.position, player.movementVector)
         Draw.bg()
-        Draw.level(level.getLevel())
+        Draw.level(level.getLevel(), frameTime, timeDelta)
         Draw.player(player)
         for (const g of ghosts) {
           Draw.ghost(g)

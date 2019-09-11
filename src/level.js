@@ -30,8 +30,11 @@ function Level(levelObject) {
   const toggleDoor = doorName => {
     const door = currentLevel.doors.find(d => d.name === doorName)
     door.open = !door.open
-    if (door.open) Sounds.doorOpen()
-    else Sounds.doorClose()
+    if (door.open) {
+      Sounds.doorOpen()
+    } else {
+      Sounds.doorClose()
+    }
   }
 
   const handleSwitches = (oldPos, newPos, radius) => {

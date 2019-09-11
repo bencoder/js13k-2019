@@ -10,7 +10,7 @@ const Settings = {
 const Draw = new Drawing(document.getElementById('c'))
 const game = new Game(levels)
 
-const levelIndex = 6
+const levelIndex = 0
 game.loadLevel(levelIndex)
 
 let previous
@@ -31,7 +31,7 @@ const update = time => {
     accumulator = 1.0 / Settings.tps
   }
 
-  game.draw(accumulator)
+  game.draw(accumulator, time / 1000.0, dt)
 
   previous = time
 }

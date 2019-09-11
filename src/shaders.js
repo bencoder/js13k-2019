@@ -2,6 +2,8 @@ const shader_basic_vert = `
 uniform mat4 Pmatrix;
 uniform mat4 Vmatrix;
 uniform highp vec3 playerLightPosition;
+uniform vec3 inTranslation;
+uniform vec3 inAmbientColor;
 
 attribute vec3 position;
 attribute vec3 normal;
@@ -12,16 +14,18 @@ varying highp vec3 vNormal;
 varying highp vec3 vPosition;
 
 void main(void) {
-  gl_Position = Pmatrix * Vmatrix * vec4(position, 1.);
-  vPosition = position;
+  vec3 wp = position + inTranslation;
+  gl_Position = Pmatrix * Vmatrix * vec4(wp, 1.);
+  vPosition = wp;
   vNormal = normal;
-  vColor = color;
+  vColor = color * inAmbientColor;
 }
 `
 
 const shader_basic_frag = `
 precision mediump float;
 uniform highp vec3 playerLightPosition;
+uniform float inSurfaceSensitivity;
 varying highp vec3 vColor;
 varying highp vec3 vNormal;
 varying highp vec3 vPosition;
@@ -36,15 +40,13 @@ void main(void) {
   vec3 surfaceToLightDirection = normalize(vPosition - vec3(playerLightPosition.x, -1., playerLightPosition.z));
   float directional = max(dot(normal, surfaceToLightDirection), 0.0);
 
-  float playerLight = 1. - distance(vPosition, vec3(playerLightPosition.x, 0., playerLightPosition.z));
+  float distanceToPlayer2D = distance(vPosition.xz, playerLightPosition.xz);
+  float spotLight = max(0.3 - vPosition.y, 0.) * max(0., 1. - distanceToPlayer2D * 1.1);
 
-  float totalLight = max(0.3 - vPosition.y, 0.) * max(0., playerLight);
-  float totalLight2 = totalLight * totalLight;
+  vec3 light = vColor * (AMBIENT_LIGHT + vec3(mix(1., directional + spotLight, inSurfaceSensitivity)))
+    + vec3(4.5 * spotLight * spotLight * inSurfaceSensitivity);
 
-  vec3 light = vColor * (AMBIENT_LIGHT + vec3(directional + totalLight))
-    + vec3(5. * totalLight2);
-
-  float fog = 1. - smoothstep(0.1,10.,vPosition.y);
+  float fog = 1. - smoothstep(0.1, 10., vPosition.y);
   gl_FragColor = vec4(light * fog, 1.);;
 }
 `

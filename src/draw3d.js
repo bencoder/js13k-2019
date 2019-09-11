@@ -20,7 +20,7 @@ const Drawing = function(canvas) {
 
   let cameraRotX = 1
   let cameraRotY = 0
-  const cameraPos = [0, -1, 2]
+  let cameraPos = null;
 
   const viewMatrix = new Float32Array(16)
   const projectionMatrix = new Float32Array(16)
@@ -57,23 +57,47 @@ const Drawing = function(canvas) {
   const uAmbientColor = gl.getUniformLocation(shaderProgram, 'inAmbientColor')
   const uSurfaceSensitivity = gl.getUniformLocation(shaderProgram, 'inSurfaceSensitivity')
 
-  this.scale = 1.5
-
   this.accumulator = 0
 
   const interpolate = (position, movementVector) => {
     return position.sub(movementVector.mul(1 - settings_tps * this.accumulator))
   }
 
+  this.resetCamera = () => {
+    cameraPos = null
+  }
+
   this.setCamera = (position, movementVector) => {
-    const camera = interpolate(position, movementVector)
+    const currentPlayerPos = interpolate(position, movementVector)
+    const desiredCameraPos = [
+      currentPlayerPos.x,
+      250,
+      -currentPlayerPos.y - 100
+    ]
 
-    playerLightPosition[0] = -camera.x * glScale
-    playerLightPosition[2] = camera.y * glScale
+    if (cameraPos === null) {
+      cameraPos = desiredCameraPos;
+    }
 
-    cameraPos[0] = -camera.x * glScale
-    cameraPos[1] = -1 - this.scale
-    cameraPos[2] = 1 + camera.y * glScale
+    const cameraMovementVector = Vec3.sub(desiredCameraPos, cameraPos)
+    const length = Vec3.len(cameraMovementVector)
+    if (length > 0) {
+      cameraPos = Vec3.add(
+        cameraPos,
+        Vec3.mul(
+          Vec3.normalize(cameraMovementVector),
+          Math.pow(length, 1.8) * 0.001
+        )
+      )
+    }
+
+    if (!pointerLocked) {
+      cameraRotX = 1 + (cameraPos[2] - desiredCameraPos[2]) / 1000
+      cameraRotY = -(cameraPos[0] - desiredCameraPos[0]) / 3000
+    }
+
+    playerLightPosition[0] = -currentPlayerPos.x * glScale
+    playerLightPosition[2] = currentPlayerPos.y * glScale
   }
 
   this.bg = () => {
@@ -262,7 +286,7 @@ const Drawing = function(canvas) {
     mat4RotateX(out, cameraRotX)
     mat4RotateY(out, cameraRotY)
     mat4RotateZ(out, -PI)
-    mat4Translate(out, -cameraPos[0], -cameraPos[1], -cameraPos[2])
+    mat4Translate(out, cameraPos[0] * glScale, cameraPos[1] * glScale, cameraPos[2] * glScale)
   }
 
   function calcProjectionMatrix() {
@@ -279,8 +303,9 @@ const Drawing = function(canvas) {
   }
 
   // TODO: remove this function
+  let pointerLocked = false
+
   function init() {
-    let pointerLocked = false
 
     canvas.addEventListener('mousemove', e => {
       if (pointerLocked) {

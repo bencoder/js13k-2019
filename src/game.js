@@ -115,6 +115,7 @@ function Game(levels) {
     player = new Player(level)
     ghosts = []
     currentTick = 0
+    Draw.resetCamera();
   }
 
   this.loadLevel(currentLevel)

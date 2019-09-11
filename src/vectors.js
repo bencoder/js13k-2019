@@ -43,7 +43,7 @@ const Vec3 = {
   cross: (p1, p2) => [p1[1] * p2[2] - p1[2] * p2[1], p1[2] * p2[0] - p1[0] * p2[2], p1[0] * p2[1] - p1[1] * p2[0]],
   len: p => sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]),
   normalize: p => {
-    const l = this.len(p)
+    const l = Vec3.len(p)
     return [p[0] / l, p[1] / l, p[2] / l]
   },
   mul: (p, n) => [p[0] * n, p[1] * n, p[2] * n]

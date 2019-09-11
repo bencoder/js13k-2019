@@ -14,24 +14,24 @@ function Player(level) {
     const movement = new Vec2(0, 0)
 
     if (buttons.up) {
-      movement.y -= Settings.playerSpeed
+      movement.y -= settings_playerSpeed
     }
     if (buttons.down) {
-      movement.y += Settings.playerSpeed
+      movement.y += settings_playerSpeed
     }
     if (buttons.left) {
-      movement.x -= Settings.playerSpeed
+      movement.x -= settings_playerSpeed
     }
     if (buttons.right) {
-      movement.x += Settings.playerSpeed
+      movement.x += settings_playerSpeed
     }
     if (movement.x || movement.y) {
-      this.drawMovementVector = movement;
+      this.drawMovementVector = movement
     }
 
-    this.movementVector = level.interact(this.position, Settings.playerRadius, movement)
+    this.movementVector = level.interact(this.position, settings_playerRadius, movement)
     this.position = this.position.add(this.movementVector)
-    if (this.movementVector.x != 0 || this.movementVector.y != 0) {
+    if (this.movementVector.x || this.movementVector.y) {
       Sounds.step()
     }
 

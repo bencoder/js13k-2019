@@ -2,15 +2,13 @@ function Level(levelObject) {
   let currentLevel = JSON.parse(JSON.stringify(levelObject))
 
   const doesCircleCollide = (position, radius) => {
-
-
     let didCollide = false
     for (let i = 0; i < currentLevel.walls.length; i++) {
       for (let j = 1; j < currentLevel.walls[i].length; j++) {
         const colPos = doesLineInterceptCircle(currentLevel.walls[i][j - 1], currentLevel.walls[i][j], position, radius)
         if (colPos) {
           position = colPos
-          i = -1;
+          i = -1
           didCollide = true
           break
         }
@@ -26,13 +24,15 @@ function Level(levelObject) {
         currentLevel.doors[i].polygon[1],
         position,
         radius
-      );
+      )
       if (colPos) {
         return colPos
       }
     }
 
-    if (didCollide) return position
+    if (didCollide) {
+      return position
+    }
 
     return false
   }
@@ -50,8 +50,8 @@ function Level(levelObject) {
   const handleSwitches = (oldPos, newPos, radius) => {
     for (const s of currentLevel.switches) {
       const switchPos = new Vec2(s.x, s.y)
-      const wasTouching = oldPos.sub(switchPos).len() < radius + Settings.switchRadius
-      const nowTouching = newPos.sub(switchPos).len() < radius + Settings.switchRadius
+      const wasTouching = oldPos.sub(switchPos).len() < radius + settings_switchRadius
+      const nowTouching = newPos.sub(switchPos).len() < radius + settings_switchRadius
       if (!wasTouching && nowTouching) {
         //only toggle if you're the first one on it
         if (s.pressed === 0) {
@@ -73,7 +73,7 @@ function Level(levelObject) {
   }
 
   const handleEnd = (position, radius) => {
-    const isEnded = position.sub(new Vec2(levelObject.end.x, levelObject.end.y)).len() < radius + Settings.switchRadius
+    const isEnded = position.sub(new Vec2(levelObject.end.x, levelObject.end.y)).len() < radius + settings_switchRadius
     if (isEnded) {
       this.completed = true
     }
@@ -81,9 +81,11 @@ function Level(levelObject) {
 
   this.ghostRemoved = (position, radius) => {
     for (const s of currentLevel.switches) {
-      const isTouching = position.sub(new Vec2(s.x, s.y)).len() < radius + Settings.switchRadius
+      const isTouching = position.sub(new Vec2(s.x, s.y)).len() < radius + settings_switchRadius
       if (isTouching) {
-        if (s.type !== 'single') s.pressed--
+        if (s.type !== 'single') {
+          s.pressed--
+        }
         if (s.pressed === 0 && s.type === 'momentary') {
           for (const target of s.targets) {
             toggleDoor(target)

@@ -1,12 +1,3 @@
-const Settings = {
-  tps: 20,
-  timeToDie: 13,
-  playerRadius: 10,
-  switchRadius: 20,
-  playerSpeed: 5,
-  maxGhosts: 4
-}
-
 const Draw = new Drawing(document.getElementById('c'))
 const game = new Game(levels)
 
@@ -23,12 +14,12 @@ const update = time => {
   const dt = (time - previous) / 1000.0
   accumulator += dt
 
-  if (accumulator > 1.0 / Settings.tps) {
-    accumulator -= 1.0 / Settings.tps
+  if (accumulator > 1.0 / settings_tps) {
+    accumulator -= 1.0 / settings_tps
     game.tick()
   }
-  if (accumulator > 1.0 / Settings.tps) {
-    accumulator = 1.0 / Settings.tps
+  if (accumulator > 1.0 / settings_tps) {
+    accumulator = 1.0 / settings_tps
   }
 
   game.draw(accumulator, time / 1000.0, dt)

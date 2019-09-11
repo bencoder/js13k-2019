@@ -7,12 +7,12 @@ function Ghost(history, level) {
       return
     }
     if (currentTick === history.length) {
-      level.ghostRemoved(this.position, Settings.playerRadius)
+      level.ghostRemoved(this.position, settings_playerRadius)
       this.dead = true
       return
     }
     this.movementVector = history[currentTick]
-    level.interact(this.position, Settings.playerRadius, this.movementVector)
+    level.interact(this.position, settings_playerRadius, this.movementVector)
     this.position = this.position.add(this.movementVector) //always apply the vector, cause we're a ghost
   }
 

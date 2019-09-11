@@ -5,8 +5,8 @@ mat4Identity[10] = 1
 mat4Identity[15] = 1
 
 const mat4RotateX = (a, radX) => {
-  const s = Math.sin(radX)
-  const c = Math.cos(radX)
+  const s = sin(radX)
+  const c = cos(radX)
   const a10 = a[4]
   const a11 = a[5]
   const a12 = a[6]
@@ -28,8 +28,8 @@ const mat4RotateX = (a, radX) => {
 }
 
 const mat4RotateY = (a, radY) => {
-  const sY = Math.sin(radY)
-  const cY = Math.cos(radY)
+  const sY = sin(radY)
+  const cY = cos(radY)
   const a00 = a[0]
   const a01 = a[1]
   const a02 = a[2]
@@ -51,8 +51,8 @@ const mat4RotateY = (a, radY) => {
 }
 
 const mat4RotateZ = (a, radZ) => {
-  const sZ = Math.sin(radZ)
-  const cZ = Math.cos(radZ)
+  const sZ = sin(radZ)
+  const cZ = cos(radZ)
   const a00 = a[0]
   const a01 = a[1]
   const a02 = a[2]

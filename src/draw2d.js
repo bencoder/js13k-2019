@@ -15,7 +15,7 @@ const Drawing = function(c) {
   this.accumulator = 0
 
   const interpolate = (position, movementVector) => {
-    return position.sub(movementVector.mul(1 - Settings.tps * this.accumulator))
+    return position.sub(movementVector.mul(1 - settings_tps * this.accumulator))
   }
 
   const worldToScreen = ({ x, y }) => ({
@@ -40,7 +40,7 @@ const Drawing = function(c) {
   const circle = (center, r, fill = false) => {
     const { x, y } = worldToScreen(center)
     ctx.beginPath()
-    ctx.arc(x, y, r * this.scale, 0, 2 * Math.PI)
+    ctx.arc(x, y, r * this.scale, 0, PI2)
     ctx.stroke()
     if (fill) {
       ctx.fill()
@@ -61,7 +61,7 @@ const Drawing = function(c) {
       x: p2.x - p1.x,
       y: p2.y - p1.y
     }
-    const length = Math.sqrt(v.x * v.x + v.y * v.y)
+    const length = sqrt(v.x * v.x + v.y * v.y)
     const s = {
       x: (v.x / length) * size,
       y: (v.y / length) * size
@@ -125,7 +125,7 @@ const Drawing = function(c) {
 
   this.timer = time => {
     const r = 255
-    const b = Math.floor(255 * (1 - time / Settings.timeToDie))
+    const b = floor(255 * (1 - time / settings_timeToDie))
 
     ctx.fillStyle = `rgb(${r},${b},${b})`
     ctx.font = '48px serif'
@@ -154,14 +154,14 @@ const Drawing = function(c) {
 
     color('yellow')
     level.switches.forEach(s => {
-      circle(s, Settings.switchRadius)
+      circle(s, settings_switchRadius)
       if (s.pressed) {
-        circle(s, Settings.switchRadius - 2)
+        circle(s, settings_switchRadius - 2)
       }
     })
 
     color('red')
-    circle(level.end, Settings.switchRadius, true)
+    circle(level.end, settings_switchRadius, true)
   }
 
   this.titleScreen = () => {

@@ -19,7 +19,7 @@ function Game(levels) {
       g.reset()
     }
     ghosts.push(new Ghost(history, level))
-    if (ghosts.length > Settings.maxGhosts) {
+    if (ghosts.length > settings_maxGhosts) {
       ghosts.shift()
     }
     currentTick = 0
@@ -52,7 +52,7 @@ function Game(levels) {
         for (const g of ghosts) {
           Draw.ghost(g)
         }
-        Draw.timer(currentTick / Settings.tps)
+        Draw.timer(currentTick / settings_tps)
         break
       case STATE_COMPLETE:
         Draw.endScreen()
@@ -81,7 +81,7 @@ function Game(levels) {
         Sounds.win()
         return
       }
-      if (currentTick === Settings.timeToDie * Settings.tps) {
+      if (currentTick === settings_timeToDie * settings_tps) {
         die()
         return
       }

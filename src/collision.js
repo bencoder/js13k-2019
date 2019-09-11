@@ -20,8 +20,8 @@ function doesLineInterceptCircle(A, B, C, radius) {
   }
   if (dist < radius * radius) {
     const wall = new Vec2(A.x + v1x * u, A.y + v1y * u) //position on wall
-    const vec = C.sub(wall).normalize(); //the vector from the wall towards the current circle position
-    return wall.add(vec.mul(radius + 0.0001)); //return the position that the circle should be in
+    const vec = C.sub(wall).normalize() //the vector from the wall towards the current circle position
+    return wall.add(vec.mul(radius + 0.0001)) //return the position that the circle should be in
   }
-  return false;
+  return false
 }

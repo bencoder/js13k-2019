@@ -101,9 +101,18 @@ const Drawing = function(canvas) {
 
   let timeDelta = 1
 
-  const playerRotation = (p, vector) => {
-    const a = vector ? atan2(-vector.y, vector.x) : 0
-    return PI / 2 - (p._r = angleLerp(p._r !== undefined ? p._r : a, a, timeDelta * 12))
+  const playerRotation = (p, movementVector) => {
+    let a
+    if (!movementVector || (movementVector.x === 0 && movementVector.y === 0)) {
+      a = p._a
+    }
+    if (a === undefined) {
+      a = atan2(-movementVector.y, movementVector.x)
+      p._a = a
+    }
+    let r = p._r
+    p._r = r = angleLerp(r !== undefined ? r : a, a, timeDelta * 12)
+    return PI / 2 - r
   }
 
   this.player = player => {

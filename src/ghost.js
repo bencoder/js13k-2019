@@ -1,6 +1,10 @@
+const defaultMovementVector = new Vec2(0, -1)
+
 function Ghost(history, level) {
   this.position = level.getStart()
-  this.movementVector = new Vec2(0, 0) //stores the last movementVector
+  //stores the last movementVector
+  this.movementVector = defaultMovementVector
+  this._a = undefined
 
   this.tick = currentTick => {
     if (currentTick > history.length) {
@@ -11,9 +15,11 @@ function Ghost(history, level) {
       this.dead = true
       return
     }
-    this.movementVector = history[currentTick]
-    level.interact(this.position, settings_playerRadius, this.movementVector)
-    this.position = this.position.add(this.movementVector) //always apply the vector, cause we're a ghost
+
+    const movementVector = history[currentTick]
+    level.interact(this.position, settings_playerRadius, movementVector)
+    this.position = this.position.add(movementVector) //always apply the vector, cause we're a ghost
+    this.movementVector = currentTick === 0 ? defaultMovementVector : movementVector
   }
 
   this.reset = () => {

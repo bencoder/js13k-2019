@@ -1,7 +1,9 @@
 const STATE_TITLE = 0
-const STATE_PLAY = 1
-const STATE_DEAD = 2
-const STATE_COMPLETE = 3
+const STATE_FADEIN = 1
+const STATE_PLAY = 2
+const STATE_DEAD = 3
+const STATE_FADEOUT = 4
+const STATE_COMPLETE = 5
 
 function Game(levels) {
   let level
@@ -10,6 +12,7 @@ function Game(levels) {
   let currentTick = 0
   let history = []
   let currentLevel = 0
+  let fadeTimer = 0
   let state = STATE_TITLE
 
   const buttons = {}
@@ -28,7 +31,7 @@ function Game(levels) {
     //reset level and player
     level.reset()
     player = new Player(level)
-    state = STATE_PLAY
+    state = STATE_FADEIN
     Draw.scale = 1.5
   }
 
@@ -43,6 +46,8 @@ function Game(levels) {
       case STATE_TITLE:
         Draw.titleScreen()
         break
+      case STATE_FADEIN:
+      case STATE_FADEOUT:
       case STATE_DEAD:
       case STATE_PLAY:
         Draw.setCamera(player.position, player.movementVector)
@@ -61,6 +66,12 @@ function Game(levels) {
   }
 
   this.tick = () => {
+    if (state === STATE_FADEIN || state === STATE_FADEOUT) {
+      if (fadeTimer > 0) {
+        fadeTimer -= 1 / settings_tps
+      }
+    }
+
     if (state === STATE_DEAD) {
       let mv = new Vec2(0, 0)
       while (mv.len() < 40 && currentTick > 0) {
@@ -94,13 +105,18 @@ function Game(levels) {
   }
 
   this.buttonDown = key => {
+    if (state === STATE_TITLE) {
+      document.body.className = 'started'
+      state = STATE_FADEIN
+      fadeTimer = 1.0
+      return
+    }
+    if (state === STATE_FADEIN && fadeTimer <= 0) {
+      state = STATE_PLAY
+    }
     buttons[key] = true
     if (key === 'back') {
       die()
-    }
-    if (state === STATE_TITLE) {
-      document.body.className = 'started'
-      state = STATE_PLAY
     }
   }
 
@@ -116,7 +132,7 @@ function Game(levels) {
     player = new Player(level)
     ghosts = []
     currentTick = 0
-    Draw.resetCamera();
+    Draw.resetCamera()
   }
 
   this.loadLevel(currentLevel)

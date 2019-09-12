@@ -1,73 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="16">
- <objectgroup id="2" name="features">
-  <object id="1" type="wall" x="416" y="832">
-   <polygon points="0,0 64,0 64,-160 160,-160 160,-224 64,-224 64,-512 0,-512 0,-224 -96,-224 -96,-160 0,-160"/>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="8">
+ <objectgroup id="3" name="features">
+  <object id="1" name="wall" type="wall" x="448" y="960">
+   <polygon points="0,0 0,-224 -320,-224 -320,-576 -32,-576 -32,-320 -256,-320 -256,-288 0,-288 0,-608 -128,-608 -128,-736 192,-736 192,-608 64,-608 64,-288 352,-288 352,-224 64,-224 64,0"/>
   </object>
-  <object id="2" name="door1" type="door" x="416" y="608">
-   <properties>
-    <property name="open" type="bool" value="false"/>
-   </properties>
-   <polygon points="0,0 64,0 0,0"/>
-  </object>
-  <object id="3" name="door2" type="door" x="416" y="544">
-   <properties>
-    <property name="open" type="bool" value="false"/>
-   </properties>
-   <polygon points="0,0 64,0 0,0"/>
-  </object>
-  <object id="4" name="door3" type="door" x="416" y="480">
-   <properties>
-    <property name="open" type="bool" value="false"/>
-   </properties>
-   <polygon points="0,0 64,0 0,0"/>
-  </object>
-  <object id="5" name="door4" type="door" x="416" y="416">
-   <properties>
-    <property name="open" type="bool" value="false"/>
-   </properties>
-   <polygon points="0,0 64,0 0,0"/>
-  </object>
-  <object id="6" name="start" type="start" x="448" y="800">
+  <object id="2" name="start" type="start" x="480" y="928">
    <point/>
   </object>
-  <object id="7" name="end" type="end" x="448" y="352">
+  <object id="3" name="end" type="end" x="480" y="288">
    <point/>
   </object>
-  <object id="11" name="switch1" type="switch" x="352" y="640">
+  <object id="4" name="switch" type="switch" x="352" y="512">
    <properties>
-    <property name="target" value="door1,door3"/>
+    <property name="target" value="door2"/>
     <property name="type" value="momentary"/>
    </properties>
    <point/>
   </object>
-  <object id="12" name="switch2" type="switch" x="416" y="640">
+  <object id="5" name="door2" type="door" x="448" y="352">
    <properties>
-    <property name="target" value="door3,door4"/>
-    <property name="type" value="momentary"/>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="0,0 64,0 63.875,6.875 -0.125,6.875"/>
+  </object>
+  <object id="6" name="switch1" type="switch" x="769" y="702">
+   <properties>
+    <property name="target" value="door1"/>
+    <property name="type" value="toggle"/>
    </properties>
    <point/>
   </object>
-  <object id="13" name="switch3" type="switch" x="480" y="640">
+  <object id="7" name="door1" type="door" x="448" y="672">
    <properties>
-    <property name="target" value="door1,door2"/>
-    <property name="type" value="momentary"/>
+    <property name="open" type="bool" value="false"/>
    </properties>
-   <point/>
-  </object>
-  <object id="14" name="switch4" type="switch" x="544" y="640">
-   <properties>
-    <property name="target" value="door2,door3"/>
-    <property name="type" value="momentary"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="15" name="switch5" type="switch" x="448" y="448">
-   <properties>
-    <property name="target" value="door4"/>
-    <property name="type" value="single"/>
-   </properties>
-   <point/>
+   <polygon points="0,0 0,64 -7.625,64 -7.625,0"/>
   </object>
  </objectgroup>
 </map>

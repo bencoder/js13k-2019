@@ -43,13 +43,11 @@ const switchUp = new Audio(
 switchDown.volume = 0.5
 switchUp.volume = 0.5
 
-const death = new Audio(
-  fxr([1, , 0.2711, , 0.3143, 0.511, , 0.1779, -0.267, 0.2011, 0.4152, , , , , , , , 1, -0.045, , , , 0.5])
-)
+const death = new Audio(fxr([1, , 0.3266, , 0.2971, 0.2594, , 0.2258, , , , , , , , 0.7482, , , 1, , , , , 0.5]))
 death.volume = 0.3
 
 const winLevel = new Audio(
-  fxr([1, , 0.0172, , 0.4828, 0.3441, , 0.2476, , 0.3651, 0.4136, , , , , , , , 1, , , , , 0.5])
+  fxr([0, , 0.261, , 0.8055, 0.4874, , 0.1788, , , , , , 0.2292, , 0.4519, , , 1, , , , , 0.5])
 )
 winLevel.volume = 0.3
 

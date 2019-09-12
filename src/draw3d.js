@@ -149,6 +149,7 @@ const Drawing = function(canvas) {
   }
 
   let timeDelta = 1
+  let startLight = 0
 
   const playerRotation = (p, movementVector) => {
     let a
@@ -242,12 +243,14 @@ const Drawing = function(canvas) {
       }
     }
 
-    gl.uniform1f(uSurfaceSensitivity, fadeLevel * 0.4)
-
     gl.uniform3f(uTranslation, -level.start.x * glScale, glScale, level.start.y * glScale)
-    gl.uniform3f(uAmbientColor, 0.1, 0, 0.5)
+
+    startLight = clamp01(startLight + timeDelta * (gameState === STATE_FADEIN ? -2 : 3))
+    gl.uniform1f(uSurfaceSensitivity, startLight / 3)
+    gl.uniform3f(uAmbientColor, 0.2 * startLight, (1 - startLight) / 4, 0.5)
     gl.drawElements(gl.TRIANGLES, builtSprites.pad.ibCount, gl.UNSIGNED_SHORT, builtSprites.pad.ibStart * 2)
 
+    gl.uniform1f(uSurfaceSensitivity, fadeLevel * 0.4)
     gl.uniform3f(uTranslation, -level.end.x * glScale, 3 * glScale, level.end.y * glScale)
     endLight = lerp(endLight, lerp(0.7, 1, 1 - abs(cos(frameTime * 1.5))), timeDelta * 4)
     gl.uniform3f(uAmbientColor, 0, endLight / 1.3, endLight)

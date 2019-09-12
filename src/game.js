@@ -10,7 +10,7 @@ function Game(levels) {
   let currentTick = 0
   let history = []
   let currentLevel = 0
-  let state = STATE_PLAY //STATE_TITLE
+  let state = STATE_TITLE
 
   const buttons = {}
 
@@ -99,6 +99,7 @@ function Game(levels) {
       die()
     }
     if (state === STATE_TITLE) {
+      document.body.className = 'started'
       state = STATE_PLAY
     }
   }

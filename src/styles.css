@@ -11,9 +11,11 @@ body {
 
 main {
   position: relative;
+  background: #000;
 }
 
 #T {
+  visibility: hidden;
   position: absolute;
   font-family: monospace;
   bottom: 0;
@@ -37,4 +39,43 @@ main {
 #c {
   padding: 0;
   display: block;
+  visibility: hidden;
+}
+
+pre {
+  color: #8fa;
+  position: absolute;
+  white-space: pre-wrap;
+  font-size: 17px;
+  padding: 1em;
+}
+
+#B {
+  display: inline-block;
+  background: #8fa;
+  animation: B 1s linear infinite;
+}
+
+@keyframes B {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  51% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.started pre {
+  display: none;
+}
+
+.started #C,
+.started #T {
+  visibility: visible;
 }

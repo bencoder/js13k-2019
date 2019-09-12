@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="49">
+ <objectgroup id="2" name="Object Layer 1">
+  <object id="1" name="end" type="end" x="496" y="478">
+   <point/>
+  </object>
+  <object id="2" name="walls" type="wall" x="256" y="96">
+   <polygon points="0,32 480,32 640,384 480,736 0,736 -160,384"/>
+  </object>
+  <object id="3" name="start" type="start" x="496.015" y="719.923">
+   <point/>
+  </object>
+  <object id="4" name="l1door" type="door" x="320" y="736">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="32,-64 320,-64 32,-64"/>
+  </object>
+  <object id="5" name="l1door_open" type="door" x="320" y="736">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="32,-64 -64,-256 32,-64"/>
+  </object>
+  <object id="6" name="l1door" type="door" x="320" y="736">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="416,-256 320,-64 416,-256"/>
+  </object>
+  <object id="7" name="l1door" type="door" x="320" y="736">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="416,-256 320,-448 416,-256"/>
+  </object>
+  <object id="8" name="l1door" type="door" x="320" y="736">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="32,-448 320,-448 32,-448"/>
+  </object>
+  <object id="9" name="l1door" type="door" x="320" y="736">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="32,-448 -64,-256 32,-448"/>
+  </object>
+  <object id="17" name="l2door_open" type="door" x="352" y="320">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="64,32 224,32 64,32"/>
+  </object>
+  <object id="18" name="l2door" type="door" x="352" y="320">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="288,160 224,32 288,160"/>
+  </object>
+  <object id="19" name="l2door" type="door" x="352" y="320">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="288,160 224,288 288,160"/>
+  </object>
+  <object id="20" name="l2door" type="door" x="352" y="320">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="64,288 224,288 64,288"/>
+  </object>
+  <object id="21" name="l2door" type="door" x="352" y="320">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="64,288 0,160 64,288"/>
+  </object>
+  <object id="22" name="l2door" type="door" x="352" y="320">
+   <properties>
+    <property name="open" type="bool" value="false"/>
+   </properties>
+   <polygon points="64,32 0,160 64,32"/>
+  </object>
+  <object id="36" name="switch2" type="switch" x="494.074" y="639.013">
+   <properties>
+    <property name="target" value="l2door_open"/>
+    <property name="type" value="momentary"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="37" name="switch1" type="switch" x="495.676" y="254.644">
+   <properties>
+    <property name="target" value="l1door_open"/>
+    <property name="type" value="momentary"/>
+   </properties>
+   <point/>
+  </object>
+  <object id="38" type="wall" x="320" y="704">
+   <polygon points="17.6169,-3.20307 -39.2069,92.8277 17.6169,-3.20307"/>
+  </object>
+  <object id="40" type="wall" x="320" y="704">
+   <polygon points="337.136,-4.75381 390.525,91.7729 337.136,-4.75381"/>
+  </object>
+  <object id="43" type="wall" x="448" y="416">
+   <polygon points="0,0 -32,64 0,128 96,128 128,64 96,0 128,64 96,128 0,128 -32,64"/>
+  </object>
+  <object id="45" type="wall" x="128" y="480">
+   <polygon points="0,0 96,0 0,0"/>
+  </object>
+  <object id="46" type="wall" x="768" y="480">
+   <polygon points="0,0 96,0 0,0"/>
+  </object>
+  <object id="47" type="wall" x="640" y="256">
+   <polygon points="14.4767,1.70314 72.8754,-92.5937 14.4767,1.70314"/>
+  </object>
+  <object id="48" type="wall" x="288" y="160">
+   <polygon points="-11.0704,2.55471 46.4767,96.8516 -11.0704,2.55471"/>
+  </object>
+ </objectgroup>
+</map>

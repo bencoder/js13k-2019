@@ -34,8 +34,11 @@ class TmxToLevelConverter {
           const points = orderClockwise(tmxPolygonPoints(polygon.points, object.x, object.y))
 
           // Polygons are all counterclockwise
-
-          level.polys.push(...absHol(points).map(orderCounterClockwise))
+          try {
+            level.polys.push(...absHol(points).map(orderCounterClockwise))
+          } catch (_e) {
+            level.polys.push(points)
+          }
           level.walls.push(orderCounterClockwise(points))
         }
       },

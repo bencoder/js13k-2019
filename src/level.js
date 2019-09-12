@@ -4,15 +4,11 @@ function Level(levelObject) {
   this.last = !!currentLevel.last
 
   const doesCircleCollide = (position, radius) => {
-    let didCollide = false
     for (let i = 0; i < currentLevel.walls.length; i++) {
       for (let j = 1; j < currentLevel.walls[i].length; j++) {
         const colPos = doesLineInterceptCircle(currentLevel.walls[i][j - 1], currentLevel.walls[i][j], position, radius)
         if (colPos) {
-          position = colPos
-          i = -1
-          didCollide = true
-          break
+          return doesCircleCollide(colPos, radius) || colPos
         }
       }
     }
@@ -28,12 +24,8 @@ function Level(levelObject) {
         radius
       )
       if (colPos) {
-        return colPos
+        return doesCircleCollide(colPos, radius) || colPos
       }
-    }
-
-    if (didCollide) {
-      return position
     }
 
     return false

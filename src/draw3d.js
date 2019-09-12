@@ -20,7 +20,7 @@ const Drawing = function(canvas) {
 
   let cameraRotX = 1
   let cameraRotY = 0
-  let cameraPos = null;
+  let cameraPos = null
 
   const viewMatrix = new Float32Array(16)
   const projectionMatrix = new Float32Array(16)
@@ -69,26 +69,16 @@ const Drawing = function(canvas) {
 
   this.setCamera = (position, movementVector) => {
     const currentPlayerPos = interpolate(position, movementVector)
-    const desiredCameraPos = [
-      currentPlayerPos.x,
-      250,
-      -currentPlayerPos.y - 100
-    ]
+    const desiredCameraPos = [currentPlayerPos.x, 250, -currentPlayerPos.y - 100]
 
     if (cameraPos === null) {
-      cameraPos = desiredCameraPos;
+      cameraPos = desiredCameraPos
     }
 
     const cameraMovementVector = Vec3.sub(desiredCameraPos, cameraPos)
     const length = Vec3.len(cameraMovementVector)
     if (length > 0) {
-      cameraPos = Vec3.add(
-        cameraPos,
-        Vec3.mul(
-          Vec3.normalize(cameraMovementVector),
-          Math.pow(length, 1.8) * 0.001
-        )
-      )
+      cameraPos = Vec3.add(cameraPos, Vec3.mul(Vec3.normalize(cameraMovementVector), Math.pow(length, 2) * 0.001))
     }
 
     if (!pointerLocked) {
@@ -306,7 +296,6 @@ const Drawing = function(canvas) {
   let pointerLocked = false
 
   function init() {
-
     canvas.addEventListener('mousemove', e => {
       if (pointerLocked) {
         const camRotSpeed = 0.01

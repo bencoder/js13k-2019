@@ -27,6 +27,7 @@ const shader_basic_frag = `
 precision mediump float;
 uniform highp vec3 playerLightPosition;
 uniform float inSurfaceSensitivity;
+uniform float inFrameTime;
 varying highp vec3 vColor;
 varying highp vec3 vNormal;
 varying highp vec3 vPosition;
@@ -44,7 +45,7 @@ float hash21(vec2 p){ return fract(sin(dot(p, vec2(141.173, 289.927)))*43758.545
 
 float hex(vec2 p) {
   vec4 h = getHex(p);
-  return hash21(h.zw);
+  return sin(hash21(h.zw)*8. + inFrameTime) * 0.5 + 0.5;
 }
 
 

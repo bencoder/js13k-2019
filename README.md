@@ -1,4 +1,4 @@
-![screenshot](/screenshots/400x200-submission-screenshot.png?raw=true)
+![screenshot](/screenshots/400x250-submission-screenshot.png?raw=true)
 
 It's year 2413, humanity is enslaved by an alien race since centuries.
 You are an AI weaponized virus built to infiltrate the main core of the alien civilization and deactivate all power generators and weapon systems.

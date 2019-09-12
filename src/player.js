@@ -32,7 +32,7 @@ function Player(level) {
     this.movementVector = level.interact(this.position, settings_playerRadius, movement)
     this.position = this.position.add(this.movementVector)
     if (this.movementVector.x || this.movementVector.y) {
-      Sounds.step()
+      Sounds.move()
     }
 
     return this.movementVector

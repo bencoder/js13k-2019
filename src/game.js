@@ -52,7 +52,7 @@ function Game(levels) {
       case STATE_PLAY:
         Draw.setCamera(player.position, player.movementVector)
         Draw.bg()
-        Draw.level(level.getLevel(), frameTime, timeDelta)
+        Draw.level(level.getLevel(), frameTime, timeDelta, state)
         Draw.player(player)
         for (const g of ghosts) {
           Draw.ghost(g)

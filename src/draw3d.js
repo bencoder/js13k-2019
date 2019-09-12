@@ -56,6 +56,8 @@ const Drawing = function(canvas) {
   const uTranslation = gl.getUniformLocation(shaderProgram, 'inTranslation')
   const uAmbientColor = gl.getUniformLocation(shaderProgram, 'inAmbientColor')
   const uSurfaceSensitivity = gl.getUniformLocation(shaderProgram, 'inSurfaceSensitivity')
+  const uFrameTime = gl.getUniformLocation(shaderProgram, 'inFrameTime')
+  const uFade = gl.getUniformLocation(shaderProgram, 'inFade')
 
   this.accumulator = 0
 
@@ -185,18 +187,21 @@ const Drawing = function(canvas) {
     return true
   }
 
+  let fadeLevel = 0
   let endLight
   let currentLevelId
   const levelState = new Map()
 
-  this.level = (level, frameTime, currentTimeDelta) => {
+  this.level = (level, frameTime, currentTimeDelta, state) => {
     timeDelta = currentTimeDelta
     if (level.id !== currentLevelId) {
       currentLevelId = level.id
       endLight = 0
-      timeDelta = 1
       levelState.clear()
     }
+
+    fadeLevel = clamp01(fadeLevel + (state === STATE_FADEOUT ? -timeDelta : timeDelta))
+    console.log(fadeLevel, state)
 
     gl.enable(gl.CULL_FACE)
     gl.cullFace(gl.BACK)
@@ -208,7 +213,10 @@ const Drawing = function(canvas) {
     gl.uniformMatrix4fv(uPmatrix, false, projectionMatrix)
     gl.uniformMatrix4fv(uVmatrix, false, viewMatrix)
     gl.uniform3fv(uPlayerLightPosition, playerLightPosition)
-    gl.uniform1f(uSurfaceSensitivity, 1)
+    gl.uniform1f(uFrameTime, frameTime)
+
+    gl.uniform1f(uSurfaceSensitivity, fadeLevel)
+    gl.uniform1f(uFade, fadeLevel)
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer)
 
@@ -233,7 +241,7 @@ const Drawing = function(canvas) {
       }
     }
 
-    gl.uniform1f(uSurfaceSensitivity, 0.4)
+    gl.uniform1f(uSurfaceSensitivity, fadeLevel * 0.4)
 
     gl.uniform3f(uTranslation, -level.start.x * glScale, glScale, level.start.y * glScale)
     gl.uniform3f(uAmbientColor, 0.1, 0, 0.5)
@@ -256,7 +264,7 @@ const Drawing = function(canvas) {
       state.g = lerp(g, pressed ? 0.3 : 0, timeDelta * 5)
       state.p = lerp(state.p, pressed ? 3.8 * glScale : 0, timeDelta * 8)
 
-      gl.uniform1f(uSurfaceSensitivity, g)
+      gl.uniform1f(uSurfaceSensitivity, fadeLevel * g)
 
       gl.uniform3f(uTranslation, -s.x * glScale, p, s.y * glScale)
       gl.uniform3f(uAmbientColor, r, g, 0)

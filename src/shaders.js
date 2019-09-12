@@ -4,6 +4,7 @@ uniform mat4 Vmatrix;
 uniform highp vec3 playerLightPosition;
 uniform vec3 inTranslation;
 uniform vec3 inAmbientColor;
+uniform highp float inFade;
 
 attribute vec3 position;
 attribute vec3 normal;
@@ -15,10 +16,10 @@ varying highp vec3 vPosition;
 
 void main(void) {
   vec3 wp = position + inTranslation;
-  gl_Position = Pmatrix * Vmatrix * vec4(wp, 1.);
+  gl_Position = Pmatrix * Vmatrix * vec4(wp + vec3(0., 1.-inFade, 0.), 1.);
   vPosition = wp;
   vNormal = normal;
-  vColor = color * inAmbientColor;
+  vColor = color * inAmbientColor * inFade;
 }
 `
 

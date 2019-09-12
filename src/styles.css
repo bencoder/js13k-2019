@@ -14,22 +14,43 @@ main {
   background: #000;
 }
 
-#T {
+#HUD {
   visibility: hidden;
   position: absolute;
-  font-family: monospace;
   bottom: 0;
+  left: 0;
+  right: 0;
   margin: 10px;
-  border-radius: 10px;
+}
+
+#T,
+#L {
+  font-family: monospace;
   padding: 15px;
-  width: 70px;
   line-height: 70px;
   font-size: 60px;
+  text-shadow: 1px 1px 3px #000;
+}
+
+#L {
+  float: right;
+  color: #afc;
+  transition: opacity 1.2s linear;
+  opacity: 0;
+}
+
+#L.a {
+  opacity: 1;
+}
+
+#T {
+  float: left;
+  border-radius: 10px;
+  width: 70px;
   text-align: center;
   transition: color 150ms linear, background-color 300ms linear;
   background: rgba(20, 0, 40, 0.3);
   border: 1px solid rgba(20, 0, 40, 0.3);
-  text-shadow: 1px 1px 3px #000;
 }
 
 #T.x {
@@ -71,11 +92,15 @@ pre {
   }
 }
 
-.started pre {
+#end {
+  display: none;
+}
+
+.started #intro {
   display: none;
 }
 
 .started #C,
-.started #T {
+.started #HUD {
   visibility: visible;
 }

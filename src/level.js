@@ -1,6 +1,8 @@
 function Level(levelObject) {
   let currentLevel = JSON.parse(JSON.stringify(levelObject))
 
+  this.last = !!currentLevel.last
+
   const doesCircleCollide = (position, radius) => {
     let didCollide = false
     for (let i = 0; i < currentLevel.walls.length; i++) {

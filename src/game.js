@@ -15,6 +15,18 @@ function Game(levels) {
   let fadeTimer = 0
   let state = STATE_TITLE
 
+  const elementL = document.getElementById('L')
+
+  let levelNameShowed = -1
+
+  function showLevelName() {
+    elementL.innerText = level.last ? 'THE MEMORY CORE' : `Level ${currentLevel}`
+    elementL.className = 'a'
+    setTimeout(() => {
+      elementL.className = ''
+    }, 2000)
+  }
+
   const buttons = {}
 
   const reset = () => {
@@ -54,10 +66,11 @@ function Game(levels) {
         Draw.bg()
         Draw.level(level.getLevel(), frameTime, timeDelta, state)
         Draw.player(player)
-        if (state == STATE_PLAY)
+        if (state == STATE_PLAY) {
           for (const g of ghosts) {
             Draw.ghost(g)
           }
+        }
         Draw.timer(currentTick / settings_tps)
         break
       case STATE_COMPLETE:
@@ -67,6 +80,11 @@ function Game(levels) {
   }
 
   this.tick = () => {
+    if (state === STATE_FADEIN && levelNameShowed !== currentLevel) {
+      levelNameShowed = currentLevel
+      showLevelName()
+    }
+
     if (state === STATE_FADEIN || state === STATE_FADEOUT) {
       if (fadeTimer > 0) {
         fadeTimer -= 1 / settings_tps

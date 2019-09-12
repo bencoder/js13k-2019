@@ -88,7 +88,9 @@ function Game(levels) {
 
     if (state === STATE_PLAY) {
       if (level.completed) {
-        this.loadLevel(currentLevel + 1)
+        state = STATE_FADEOUT
+        player.movementVector = new Vec2(0, 0) //stops flickering while fading out
+        fadeTimer = 1.0
         Sounds.win()
         return
       }
@@ -101,6 +103,12 @@ function Game(levels) {
         g.tick(currentTick)
       }
       ++currentTick
+    }
+
+    if (state === STATE_FADEOUT && fadeTimer <= 0) {
+      this.loadLevel(currentLevel + 1)
+      state = STATE_FADEIN
+      fadeTimer = 1.0
     }
   }
 

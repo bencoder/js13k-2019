@@ -1,9 +1,3 @@
-const hexagonPoints = []
-for (let i = 0; i < 6; ++i) {
-  const angle = (i / 6) * PI2
-  hexagonPoints.push([sin(angle), cos(angle)])
-}
-
 const COLOR_DEEP_WALLS = colour(0, 50, 100)
 const COLOR_PILLARS = colour(0, 80, 230)
 const COLOR_SMALL_WALLS = colour(0, 100, 255)
@@ -19,7 +13,8 @@ let builtIndices
 const builtSprites = {
   player: {},
   ghost: {},
-  pad: {}
+  pad: {},
+  core: {}
 }
 
 ;(() => {
@@ -75,8 +70,13 @@ const builtSprites = {
     }
   }
 
-  const makeHexagon = (centerX, centerZ, radius, y0, y1, c, c2) => {
-    makePolygonWithWalls(hexagonPoints.map(p => [p[0] * radius + centerX, p[1] * radius + centerZ]), y0, y1, c, c2)
+  const makeHexagon = (centerX, centerZ, radius, y0, y1, c, c2, initAngle = 0) => {
+    const pts = []
+    for (let i = 0; i < 6; ++i) {
+      const angle = initAngle + (i / 6) * PI2
+      pts.push([sin(angle) * radius + centerX, cos(angle) * radius + centerZ])
+    }
+    makePolygonWithWalls(pts, y0, y1, c, c2)
   }
 
   //b and t are each 4 vertexes, anticlockwise (when looking from above) for bottom and top of the shape
@@ -202,6 +202,13 @@ const builtSprites = {
   builtSprites.pad.ibStart = indices.length
   makeHexagon(0, 0, glSwitchRadius, -4, 0.1, [1, 1, 1], [0.5, 0.5, 0.5])
   builtSprites.pad.ibCount = indices.length - builtSprites.pad.ibStart
+
+  builtSprites.core.ibStart = indices.length
+  for (let i = 0; i < 25; i += 2) {
+    const d = i / 5
+    makeHexagon(0, 0, glSwitchRadius, -4 - i * 5, 0.1 - i * 5 + d, [1, 1, 1], [0.5, 0.5, 0.5], i)
+  }
+  builtSprites.core.ibCount = indices.length - builtSprites.core.ibStart
 
   builtVertices = new Float32Array(vertices)
   builtNormals = new Float32Array(normals)

@@ -190,9 +190,11 @@ const Drawing = function(canvas) {
   let fadeLevel = 0
   let endLight
   let currentLevelId
+  let gameState = STATE_FADEOUT
   const levelState = new Map()
 
-  this.level = (level, frameTime, currentTimeDelta, state) => {
+  this.level = (level, frameTime, currentTimeDelta, currentCameState) => {
+    gameState = currentCameState
     timeDelta = currentTimeDelta
     if (level.id !== currentLevelId) {
       currentLevelId = level.id
@@ -200,8 +202,7 @@ const Drawing = function(canvas) {
       levelState.clear()
     }
 
-    fadeLevel = clamp01(fadeLevel + (state === STATE_FADEOUT ? -timeDelta : timeDelta))
-    console.log(fadeLevel, state)
+    fadeLevel = clamp01(fadeLevel + (gameState === STATE_FADEOUT ? -timeDelta : timeDelta))
 
     gl.enable(gl.CULL_FACE)
     gl.cullFace(gl.BACK)
@@ -254,15 +255,15 @@ const Drawing = function(canvas) {
 
     for (const s of level.switches) {
       const { uid, pressed } = s
-      let state = levelState.get(uid)
-      if (!state) {
-        levelState.set(uid, (state = { r: 1, g: 0, p: 0 }))
+      let switchState = levelState.get(uid)
+      if (!switchState) {
+        levelState.set(uid, (switchState = { r: 1, g: 0, p: 0 }))
       }
 
-      const { r, g, p } = state
-      state.r = lerp(r, pressed ? 0.1 : lerp(0.7, 1, 1 - abs(cos(frameTime * 3))), timeDelta * 4)
-      state.g = lerp(g, pressed ? 0.3 : 0, timeDelta * 5)
-      state.p = lerp(state.p, pressed ? 3.8 * glScale : 0, timeDelta * 8)
+      const { r, g, p } = switchState
+      switchState.r = lerp(r, pressed ? 0.1 : lerp(0.7, 1, 1 - abs(cos(frameTime * 3))), timeDelta * 4)
+      switchState.g = lerp(g, pressed ? 0.3 : 0, timeDelta * 5)
+      switchState.p = lerp(switchState.p, pressed ? 3.8 * glScale : 0, timeDelta * 8)
 
       gl.uniform1f(uSurfaceSensitivity, fadeLevel * g)
 

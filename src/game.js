@@ -125,9 +125,13 @@ function Game(levels) {
     }
 
     if (state === STATE_FADEOUT && fadeTimer <= 0) {
-      this.loadLevel(currentLevel + 1)
-      state = STATE_FADEIN
-      fadeTimer = 1.0
+      if (level.last) {
+        document.body.className = 'started won'
+      } else {
+        this.loadLevel(currentLevel + 1)
+        state = STATE_FADEIN
+        fadeTimer = 1.0
+      }
     }
   }
 

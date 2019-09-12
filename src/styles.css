@@ -67,7 +67,7 @@ pre {
   color: #8fa;
   position: absolute;
   white-space: pre-wrap;
-  font-size: 17px;
+  font-size: 19px;
   padding: 1em;
 }
 
@@ -93,6 +93,14 @@ pre {
 }
 
 #end {
+  display: none;
+}
+
+.won #end {
+  display: block;
+}
+
+.won #hud {
   display: none;
 }
 

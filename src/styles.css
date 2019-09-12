@@ -2,6 +2,12 @@
   user-select: none;
 }
 
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background: #333;
   display: flex;
@@ -9,9 +15,40 @@ body {
   justify-content: center;
 }
 
-main {
+#M {
   position: relative;
   background: #000;
+
+  width: 800px;
+  height: 600px;
+}
+
+@media screen and (min-width: 901px) {
+  #M {
+    width: 900px;
+    height: 600px;
+  }
+}
+
+@media screen and (min-width: 1000px) and (min-height: 667px) {
+  #M {
+    width: 999px;
+    height: 666px;
+  }
+}
+
+@media screen and (min-width: 1200px) and (min-height: 800px) {
+  #M {
+    width: 1199px;
+    height: 799px;
+  }
+}
+
+@media screen and (min-width: 1400px) and (min-height: 933px) {
+  #M {
+    width: 1399px;
+    height: 932px;
+  }
 }
 
 #HUD {

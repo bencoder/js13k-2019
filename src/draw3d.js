@@ -1,7 +1,8 @@
 const Drawing = function(canvas) {
   /** @type {WebGLRenderingContext} */
   const gl = canvas.getContext('webgl')
-  const Telement = document.getElementById('T')
+  const elementMain = document.getElementById('M')
+  const elementT = document.getElementById('T')
 
   const createGlBuffer = (items, type = gl.ARRAY_BUFFER) => {
     const result = gl.createBuffer()
@@ -15,8 +16,18 @@ const Drawing = function(canvas) {
   const colors_buffer = createGlBuffer(builtColors)
   const index_buffer = createGlBuffer(builtIndices, gl.ELEMENT_ARRAY_BUFFER)
 
-  const canvasWidth = canvas.clientWidth
-  const canvasHeight = canvas.clientHeight
+  let canvasWidth = 0
+  let canvasHeight = 0
+
+  const handleResize = () => {
+    const w = elementMain.clientWidth
+    const h = elementMain.clientHeight
+    if (canvasWidth !== w || canvasHeight !== h) {
+      canvas.width = canvasWidth = w
+      canvas.height = canvasHeight = h
+      calcProjectionMatrix()
+    }
+  }
 
   let cameraRotX = 1
   let cameraRotY = 0
@@ -25,7 +36,9 @@ const Drawing = function(canvas) {
   const viewMatrix = new Float32Array(16)
   const projectionMatrix = new Float32Array(16)
   const playerLightPosition = new Float32Array(3)
-  calcProjectionMatrix()
+
+  handleResize()
+  window.addEventListener('resize', handleResize)
 
   const createGlShasder = (program, input, type) => {
     const shader = gl.createShader(type)
@@ -118,7 +131,7 @@ const Drawing = function(canvas) {
 
     if (timerS !== s || time - timerUpdateTime > 0.2) {
       if (timerX) {
-        Telement.className = ''
+        elementT.className = ''
       }
 
       timerUpdateTime = time
@@ -134,16 +147,16 @@ const Drawing = function(canvas) {
         timerG = g
 
         const b = round(128 * v.x * v.x)
-        Telement.style.color = `rgb(${r},${g},${b})`
+        elementT.style.color = `rgb(${r},${g},${b})`
       }
 
       if (timerS !== s) {
         timerS = s
         if (s < 4) {
           timerX = 1
-          Telement.className = 'x'
+          elementT.className = 'x'
         }
-        Telement.innerText = s
+        elementT.innerText = s
       }
     }
   }

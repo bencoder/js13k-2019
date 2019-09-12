@@ -192,11 +192,17 @@ const builtSprites = {
   }
 
   builtSprites.player.ibStart = indices.length
-  makeTriangle([0, -1, -10], [-6, -1, 5], [6, -1, 5], [1, 0, 0])
+  makeTriangle([0, -1, -10], [0, -3, 5], [7, -1, 5], [0.8, 0, 0.8])
+  makeTriangle([0, -1, -10], [-7, -1, 5], [0, -3, 5], [0.6, 0, 0.6])
+  makeTriangle([0, -3, 5], [-7, -1, 5], [0, -1, 10], [0.5, 0, 0.4])
+  makeTriangle([0, -3, 5], [0, -1, 10], [7, -1, 5], [0.7, 0, 0.4])
   builtSprites.player.ibCount = indices.length - builtSprites.player.ibStart
 
   builtSprites.ghost.ibStart = indices.length
-  makeTriangle([0, -1, -10], [-6, -1, 5], [6, -1, 5], [0, 0, 0])
+  makeTriangle([0, -1, -10], [0, -1, 5], [7, -1, 5], [0.2, 0, 0.2])
+  makeTriangle([0, -1, -10], [-7, -1, 5], [0, -1, 5], [0.15, 0, 0.15])
+  makeTriangle([0, -1, 5], [-7, -1, 5], [0, -1, 10], [0.11, 0, 0.1])
+  makeTriangle([0, -1, 5], [0, -1, 10], [7, -1, 5], [0.19, 0, 0.1])
   builtSprites.ghost.ibCount = indices.length - builtSprites.ghost.ibStart
 
   builtSprites.pad.ibStart = indices.length

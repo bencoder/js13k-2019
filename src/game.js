@@ -54,9 +54,10 @@ function Game(levels) {
         Draw.bg()
         Draw.level(level.getLevel(), frameTime, timeDelta, state)
         Draw.player(player)
-        for (const g of ghosts) {
-          Draw.ghost(g)
-        }
+        if (state == STATE_PLAY)
+          for (const g of ghosts) {
+            Draw.ghost(g)
+          }
         Draw.timer(currentTick / settings_tps)
         break
       case STATE_COMPLETE:

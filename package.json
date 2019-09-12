@@ -34,9 +34,7 @@
     "mkdirp": "^0.5.1",
     "prettier": "^1.18.2",
     "prettysize": "^2.0.0",
-    "uglify-es": "^3.3.9"
-  },
-  "dependencies": {
-    "csso": "^3.5.1"
+    "csso": "^3.5.1",
+    "terser": "^4.3.1"
   }
 }

@@ -32,6 +32,20 @@ varying highp vec3 vPosition;
 
 const vec3 AMBIENT_LIGHT = vec3(0.2, 0.2, 0.3);
 const vec3 PLAYER_LIGHT_COLOR = vec3(0., 1., 1.);
+const vec2 s = vec2(1, 1.7320508);
+vec4 getHex(vec2 p){
+  vec4 hC = floor(vec4(p, p - vec2(.5, 1))/s.xyxy) + .5;
+  vec4 h = vec4(p - hC.xy*s, p - (hC.zw + .5)*s);
+  return dot(h.xy, h.xy)<dot(h.zw, h.zw) ? vec4(h.xy, hC.xy) : vec4(h.zw, hC.zw + 9.43);
+}
+
+float hash21(vec2 p){ return fract(sin(dot(p, vec2(141.173, 289.927)))*43758.5453); }
+
+float hex(vec2 p) {
+  vec4 h = getHex(p);
+  return hash21(h.zw);
+}
+
 
 void main(void) {
 
@@ -45,6 +59,10 @@ void main(void) {
 
   vec3 light = vColor * (AMBIENT_LIGHT + vec3(mix(1., directional + spotLight, inSurfaceSensitivity)))
     + vec3(4.5 * spotLight * spotLight * inSurfaceSensitivity);
+
+  if (normal.y > 0.95 && normal.y < 1.05 && vPosition.y  > 0.) {
+    light *= mix(0.6, 0.8, 1.-hex(vPosition.xz*5.));
+  }
 
   float fog = 1. - smoothstep(0.1, 10., vPosition.y);
   gl_FragColor = vec4(light * fog, 1.);;

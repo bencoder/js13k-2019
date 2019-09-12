@@ -403,6 +403,7 @@ const levels = [
       { uid: 20, x: 192, y: 352, targets: ['door2', 'door1'], type: 'momentary', pressed: 0 }
     ],
     start: { x: 192, y: 192 },
-    end: { x: 192, y: 32 }
+    end: { x: 192, y: 32 },
+    last: 1
   }
 ]

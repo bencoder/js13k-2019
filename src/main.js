@@ -1,7 +1,7 @@
 const Draw = new Drawing(document.getElementById('c'))
 const game = new Game(levels)
 
-const levelIndex = 1
+const levelIndex = 0
 game.loadLevel(levelIndex)
 
 let previous

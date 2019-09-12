@@ -251,7 +251,9 @@ const Drawing = function(canvas) {
     gl.uniform3f(uTranslation, -level.end.x * glScale, 3 * glScale, level.end.y * glScale)
     endLight = lerp(endLight, lerp(0.7, 1, 1 - abs(cos(frameTime * 1.5))), timeDelta * 4)
     gl.uniform3f(uAmbientColor, 0, endLight / 1.3, endLight)
-    gl.drawElements(gl.TRIANGLES, builtSprites.pad.ibCount, gl.UNSIGNED_SHORT, builtSprites.pad.ibStart * 2)
+
+    const endSprite = level.last ? builtSprites.core : builtSprites.pad
+    gl.drawElements(gl.TRIANGLES, endSprite.ibCount, gl.UNSIGNED_SHORT, endSprite.ibStart * 2)
 
     for (const s of level.switches) {
       const { uid, pressed } = s

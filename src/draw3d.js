@@ -29,8 +29,8 @@ const Drawing = function(canvas) {
     }
   }
 
-  let cameraRotX = 1
-  let cameraRotY = 0
+  const cameraRotX = 1
+  const cameraRotY = 0
   let cameraPos = null
 
   const viewMatrix = new Float32Array(16)
@@ -94,11 +94,6 @@ const Drawing = function(canvas) {
     const length = Vec3.len(cameraMovementVector)
     if (length > 0) {
       cameraPos = Vec3.add(cameraPos, Vec3.mul(Vec3.normalize(cameraMovementVector), Math.pow(length, 2) * 0.001))
-    }
-
-    if (!pointerLocked) {
-      cameraRotX = 1 + (cameraPos[2] - desiredCameraPos[2]) / 1000
-      cameraRotY = -(cameraPos[0] - desiredCameraPos[0]) / 3000
     }
 
     playerLightPosition[0] = -currentPlayerPos.x * glScale
@@ -318,49 +313,4 @@ const Drawing = function(canvas) {
     projectionMatrix[11] = -1
     projectionMatrix[14] = (-2 * zMax * zMin) / (zMax - zMin)
   }
-
-  // TODO: remove this function
-  let pointerLocked = false
-
-  function init() {
-    canvas.addEventListener('mousemove', e => {
-      if (pointerLocked) {
-        const camRotSpeed = 0.01
-        cameraRotY += (e.movementX || 0) * camRotSpeed
-        if (cameraRotY < 0) {
-          cameraRotY += PI2
-        }
-        if (cameraRotY >= PI2) {
-          cameraRotY -= PI2
-        }
-        cameraRotX += (e.movementY || 0) * camRotSpeed
-        if (cameraRotX < -PI * 0.5) {
-          cameraRotX = -PI * 0.5
-        }
-        if (cameraRotX > PI * 0.5) {
-          cameraRotX = PI * 0.5
-        }
-      }
-    })
-
-    canvas.addEventListener('mousedown', e => {
-      if (e.button === 0) {
-        if (!pointerLocked) {
-          canvas.requestPointerLock()
-        }
-      } else {
-        document.exitPointerLock()
-      }
-    })
-
-    document.addEventListener(
-      'pointerlockchange',
-      () => {
-        pointerLocked = document.pointerLockElement === canvas
-      },
-      false
-    )
-  }
-
-  init()
 }

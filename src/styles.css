@@ -9,7 +9,7 @@ body {
 }
 
 body {
-  background: #333;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,6 +101,11 @@ body {
 }
 
 pre {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
   color: #8fa;
   position: absolute;
   white-space: pre-wrap;

@@ -1,4 +1,4 @@
-[[https://github.com/bencoder/js13k-2019/blob/master/screenshots/400x200-submission-screenshot.png|alt=screenshot]]
+![screenshot](/screenshots/400x200-submission-screenshot.png?raw=true)
 
 It's year 2413, humanity is enslaved by an alien race since centuries.
 You are an AI weaponized virus built to infiltrate the main core of the alien civilization and deactivate all power generators and weapon systems.

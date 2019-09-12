@@ -43,6 +43,8 @@ window.addEventListener('keydown', ev => {
   if (keyMap[ev.code]) {
     game.buttonDown(keyMap[ev.code])
     ev.preventDefault()
+  } else {
+    game.buttonDown('*') //any-key
   }
   return false
 })

@@ -46,10 +46,12 @@ switchUp.volume = 0.5
 const death = new Audio(
   fxr([1, , 0.2711, , 0.3143, 0.511, , 0.1779, -0.267, 0.2011, 0.4152, , , , , , , , 1, -0.045, , , , 0.5])
 )
+death.volume = 0.3
 
 const winLevel = new Audio(
   fxr([1, , 0.0172, , 0.4828, 0.3441, , 0.2476, , 0.3651, 0.4136, , , , , , , , 1, , , , , 0.5])
 )
+winLevel.volume = 0.3
 
 let movePlaying = false
 let moveIndex = 0
@@ -73,9 +75,9 @@ const Sounds = {
     switchUp.play()
   },
   death() {
-    //death.play()
+    death.play()
   },
   win() {
-    //winLevel.play()
+    winLevel.play()
   }
 }

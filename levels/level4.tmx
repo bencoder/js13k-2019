@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="12">
  <objectgroup id="3" name="features">
-  <object id="1" name="walls" type="wall" x="416" y="768" visible="0">
+  <object id="1" name="walls" type="wall" x="416" y="768">
    <polygon points="0,192 0,-480 -96,-480 -96,-96 -32,-96 -32,32 -160,32 -160,-544 0,-544 0,-672 -224,-672 -224,64 -32,64 -32,192 -288,192 -288,-736 64,-736 64,-544 224,-544 224,32 96,32 96,-96 160,-96 160,-480 64,-480 64,192"/>
   </object>
   <object id="2" name="start" type="start" x="448" y="736">

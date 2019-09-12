@@ -245,7 +245,7 @@ const Drawing = function(canvas) {
 
     gl.uniform3f(uTranslation, -level.start.x * glScale, glScale, level.start.y * glScale)
 
-    startLight = clamp01(startLight + timeDelta * (gameState === STATE_FADEIN ? -2 : 3))
+    startLight = fadeLevel * clamp01(startLight + timeDelta * (gameState === STATE_FADEIN ? -2 : 3))
     gl.uniform1f(uSurfaceSensitivity, startLight / 3)
     gl.uniform3f(uAmbientColor, 0.2 * startLight, (1 - startLight) / 4, 0.5)
     gl.drawElements(gl.TRIANGLES, builtSprites.pad.ibCount, gl.UNSIGNED_SHORT, builtSprites.pad.ibStart * 2)

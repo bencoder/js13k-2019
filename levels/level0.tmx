@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="6">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="22">
  <objectgroup id="3" name="features">
   <object id="1" name="walls" type="wall" x="416" y="768">
-   <polygon points="0,0 0,-480 -96,-480 -96,-608 160,-608 160,-480 64,-480 64,0"/>
+   <polygon points="-32,-64 0,-96 0,-192 0,-288 0,-384 0,-480 -96,-480 -96,-608 160,-608 160,-480 64,-480 64,-384 64,-288 64,-192 64,-96 96,-64 96,0 64,32 0,32 -32,0"/>
   </object>
   <object id="2" name="start" type="start" x="448" y="736">
    <point/>

@@ -146,6 +146,16 @@ pre {
   display: none;
 }
 
+#intro {
+  overflow: hidden;
+  max-height: 0px;
+  transition: max-height 1.2s linear;
+}
+
+#intro.a {
+  max-height: 100%;
+}
+
 .started #intro {
   display: none;
 }
@@ -156,8 +166,14 @@ pre {
 }
 
 small {
+  font-family: monospace;
+  font-size: 13px;
   position: absolute;
   right: 0;
   bottom: 15px;
   color: #040;
+}
+
+.started small {
+  display: none;
 }

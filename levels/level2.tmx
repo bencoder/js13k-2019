@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="16">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="3" nextobjectid="22">
  <objectgroup id="2" name="features">
   <object id="1" type="wall" x="416" y="832">
    <polygon points="0,0 64,0 64,-160 160,-160 160,-224 64,-224 64,-512 0,-512 0,-224 -96,-224 -96,-160 0,-160"/>
@@ -68,6 +68,18 @@
     <property name="type" value="single"/>
    </properties>
    <point/>
+  </object>
+  <object id="16" type="wall" x="586.507" y="514.112">
+   <polygon points="-10.5072,253.888 -10.5072,189.888 -74.5072,189.888 -74.5072,253.888"/>
+  </object>
+  <object id="19" type="wall" x="393.957" y="513.225">
+   <polygon points="-9.95655,254.775 -9.95655,190.775 -73.9566,190.775 -73.9566,254.775"/>
+  </object>
+  <object id="20" type="wall" x="393.393" y="320.779">
+   <polygon points="-9.39291,255.221 -9.39291,191.221 -73.3929,191.221 -73.3929,255.221"/>
+  </object>
+  <object id="21" type="wall" x="590.001" y="316.995">
+   <polygon points="-14.0014,259.005 -14.0014,195.005 -78.0014,195.005 -78.0014,259.005"/>
   </object>
  </objectgroup>
 </map>

@@ -37,30 +37,36 @@ function Level(levelObject) {
   }
 
   const handleSwitches = (oldPos, newPos, radius) => {
-    for (const s of currentLevel.switches) {
-      const switchPos = new Vec2(s.x, s.y)
-      const wasTouching = oldPos.sub(switchPos).len() < radius + settings_switchRadius
-      const nowTouching = newPos.sub(switchPos).len() < radius + settings_switchRadius
-      if (!wasTouching && nowTouching) {
-        //only toggle if you're the first one on it
-        if (s.pressed === 0) {
+    if (oldPos.x !== newPos.x || oldPos.y !== newPos.y) {
+      for (const s of currentLevel.switches) {
+        const switchPos = new Vec2(s.x, s.y)
+        const wasTouching = oldPos.sub(switchPos).len() < radius + settings_switchRadius
+        const nowTouching = newPos.sub(switchPos).len() < radius + settings_switchRadius
+
+        if (!wasTouching && nowTouching) {
+          //only toggle if you're the first one on it
+          if (s.pressed === 0) {
+            for (const target of s.targets) {
+              toggleDoor(target)
+            }
+            Sounds.switchDown()
+          }
+          s.pressed++
+        }
+        if (wasTouching && !nowTouching && s.type !== 'single') {
+          if (s.pressed <= 0) {
+            continue
+          }
+          s.pressed--
+        }
+        if (wasTouching && !nowTouching && s.type === 'momentary' && s.pressed === 0) {
           for (const target of s.targets) {
             toggleDoor(target)
           }
-          Sounds.switchDown()
         }
-        s.pressed++
-      }
-      if (wasTouching && !nowTouching && s.type !== 'single') {
-        s.pressed--
-      }
-      if (wasTouching && !nowTouching && s.type === 'momentary' && s.pressed === 0) {
-        for (const target of s.targets) {
-          toggleDoor(target)
+        if (wasTouching && !nowTouching && s.pressed === 0) {
+          Sounds.switchUp()
         }
-      }
-      if (wasTouching && !nowTouching && s.pressed === 0) {
-        Sounds.switchUp()
       }
     }
   }
@@ -95,8 +101,11 @@ function Level(levelObject) {
   }
 
   this.interact = (oldPos, radius, plannedVector) => {
-    const newPos = oldPos.add(plannedVector)
+    let newPos = oldPos.add(plannedVector)
+
     const collisionPosition = doesCircleCollide(newPos, radius)
+
+    newPos = collisionPosition || newPos
 
     handleSwitches(oldPos, newPos, radius)
 

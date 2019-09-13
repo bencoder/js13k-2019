@@ -4,6 +4,10 @@ const game = new Game(levels)
 const levelIndex = 0
 game.loadLevel(levelIndex)
 
+setTimeout(() => {
+  document.getElementById('intro').className = 'a'
+}, 1)
+
 let previous
 let accumulator = 0 //stores incrementing value (in seconds) until the next tick, when it's then decremented by 1 tick's length
 const update = time => {

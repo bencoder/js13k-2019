@@ -2,7 +2,7 @@
 <map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="8">
  <objectgroup id="3" name="features">
   <object id="1" name="wall" type="wall" x="448" y="960">
-   <polygon points="0,0 0,-224 -320,-224 -320,-576 -32,-576 -32,-320 -256,-320 -256,-288 0,-288 0,-608 -128,-608 -128,-736 192,-736 192,-608 64,-608 64,-288 352,-288 352,-224 64,-224 64,0"/>
+   <polygon points="0,0 0,-96 0,-224 -128,-224 -320,-224 -352,-256 -352,-480 -256,-576 -96,-576 -32,-512 -32,-416 -96,-352 -224,-352 -256,-320 -256,-288 -128,-288 0,-288 0,-416 0,-608 -64,-608 -128,-672 -64,-736 128,-736 192,-672 128,-608 64,-608 64,-416 64,-288 192,-288 352,-288 352,-224 192,-224 64,-224 64,-96 64,0"/>
   </object>
   <object id="2" name="start" type="start" x="480" y="928">
    <point/>

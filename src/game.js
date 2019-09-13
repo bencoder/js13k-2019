@@ -66,7 +66,7 @@ function Game(levels) {
         Draw.bg()
         Draw.level(level.getLevel(), frameTime, timeDelta, state)
         Draw.player(player)
-        if (state == STATE_PLAY) {
+        if (state === STATE_PLAY) {
           for (const g of ghosts) {
             Draw.ghost(g)
           }

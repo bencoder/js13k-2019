@@ -154,3 +154,10 @@ pre {
 .started #HUD {
   visibility: visible;
 }
+
+small {
+  position: absolute;
+  right: 0;
+  bottom: 15px;
+  color: #040;
+}

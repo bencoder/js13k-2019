@@ -29,8 +29,8 @@ const Drawing = function(canvas) {
     }
   }
 
-  const cameraRotX = 1
-  const cameraRotY = 0
+  let cameraRotX = 1
+  let cameraRotY = 0
   let cameraPos = null
 
   const viewMatrix = new Float32Array(16)
@@ -95,6 +95,9 @@ const Drawing = function(canvas) {
     if (length > 0) {
       cameraPos = Vec3.add(cameraPos, Vec3.mul(Vec3.normalize(cameraMovementVector), Math.pow(length, 2) * 0.001))
     }
+
+    cameraRotX = 1 + (cameraPos[2] - desiredCameraPos[2]) / 1000
+    cameraRotY = -(cameraPos[0] - desiredCameraPos[0]) / 3000
 
     playerLightPosition[0] = -currentPlayerPos.x * glScale
     playerLightPosition[2] = currentPlayerPos.y * glScale

@@ -59,3 +59,25 @@ window.addEventListener('keyup', ev => {
   }
   return false
 })
+let touchX = 0
+let touchY = 0
+window.addEventListener('touchstart', ev => {
+  touchX = ev.changedTouches[0].clientX
+  touchY = ev.changedTouches[0].clientY
+})
+window.addEventListener('touchmove', ev => {
+  const diffX = ev.changedTouches[0].clientX - touchX
+  const diffY = ev.changedTouches[0].clientY - touchY
+  game.buttonUp()
+  if (Math.abs(diffX) > Math.abs(diffY)) {
+    game.buttonDown(diffX > 0 ? 'right' : 'left')
+  } else {
+    game.buttonDown(diffY > 0 ? 'down' : 'up')
+  }
+})
+window.addEventListener('touchend', () => {
+  game.buttonUp()
+})
+window.addEventListener('touchcancel', () => {
+  game.buttonUp()
+})

@@ -27,7 +27,7 @@ function Game(levels) {
     }, 2000)
   }
 
-  const buttons = {}
+  let buttons = {}
 
   const reset = () => {
     for (const g of ghosts) {
@@ -151,7 +151,12 @@ function Game(levels) {
     }
   }
 
-  this.buttonUp = key => (buttons[key] = false)
+  this.buttonUp = key => {
+    if (key === undefined) {
+      buttons = {}
+    }
+    buttons[key] = false
+  }
 
   this.loadLevel = index => {
     currentLevel = index

@@ -24,7 +24,7 @@ jobs:
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/out/out.zip
+        file: out/out.zip
         asset_name: xx142-b2.zip
         tag: latest
         overwrite: true

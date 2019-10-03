@@ -34,4 +34,7 @@ jobs:
           mv out/index.html .
           git add index.html
           git commit -m "Update"
-          git push
+    - uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages

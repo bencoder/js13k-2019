@@ -16,38 +16,31 @@ body {
 }
 
 #M {
-  position: relative;
+  position: absolute;
   background: #000;
-
-  width: 800px;
-  height: 600px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
-@media screen and (min-width: 901px) {
-  #M {
-    width: 900px;
-    height: 600px;
-  }
+#M {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+
+  width: 100vw;
+  height: 66.66vw;
+  background: #000;
 }
 
-@media screen and (min-width: 1000px) and (min-height: 667px) {
+@media (min-aspect-ratio: 3/2) {
   #M {
-    width: 999px;
-    height: 666px;
-  }
-}
-
-@media screen and (min-width: 1200px) and (min-height: 800px) {
-  #M {
-    width: 1199px;
-    height: 799px;
-  }
-}
-
-@media screen and (min-width: 1400px) and (min-height: 933px) {
-  #M {
-    width: 1399px;
-    height: 932px;
+    width: 150vh;
+    height: 100vh;
   }
 }
 

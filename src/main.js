@@ -61,6 +61,15 @@ window.addEventListener('keyup', ev => {
 })
 let touchX = 0
 let touchY = 0
+
+let fullscreen = false
+function openFullscreen() {
+  if (!fullscreen) {
+    document.documentElement.requestFullscreen()
+    fullscreen = true
+  }
+}
+
 window.addEventListener('touchstart', ev => {
   touchX = ev.changedTouches[0].clientX
   touchY = ev.changedTouches[0].clientY
@@ -74,8 +83,11 @@ window.addEventListener('touchmove', ev => {
   } else {
     game.buttonDown(diffY > 0 ? 'down' : 'up')
   }
+  ev.preventDefault()
+  return false
 })
-window.addEventListener('touchend', () => {
+window.addEventListener('touchend', ev => {
+  openFullscreen()
   game.buttonUp()
 })
 window.addEventListener('touchcancel', () => {

@@ -9,22 +9,29 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-    - name: npm install, zip, upload to git
-      run: |
-        npm install
-        npm run zip
-      env:
-        CI: true
-    - name: Upload zip to release
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: out/out.zip
-        asset_name: xx142-b2.zip
-        tag: latest
-        overwrite: true
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: npm install, zip, upload to git
+        run: |
+          npm install
+          npm run zip
+        env:
+          CI: true
+      - name: Upload zip to release
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: out/out.zip
+          asset_name: xx142-b2.zip
+          tag: latest
+          overwrite: true
+      - name: copy to gh-pages branch
+        run: |
+          git checkout gh-pages
+          mv out/index.html .
+          git add index.html
+          git commit -m "Update"
+          git push

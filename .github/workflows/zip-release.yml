@@ -30,6 +30,8 @@ jobs:
           overwrite: true
       - name: copy to gh-pages branch
         run: |
+          git config user.email "none@example.com"
+          git config user.name "Github Actions"
           git checkout gh-pages
           mv out/index.html .
           git add index.html

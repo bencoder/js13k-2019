@@ -65,7 +65,7 @@ let touchY = 0
 let fullscreen = false
 function openFullscreen() {
   if (!fullscreen) {
-    document.documentElement.requestFullscreen()
+    document.documentElement.requestFullscreen({ navigationUI: 'hide' })
     fullscreen = true
   }
 }

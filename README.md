@@ -23,7 +23,8 @@ Backspace - kill -9 xx142-b2.exe
 
 - Ben Clark and Salvatore Previti
 
-Submission for https://js13kgames.com/ 2019
+Fist place in the Overall/Desktop category for js13k 2019 - https://2019.js13kgames.com/#in - https://github.blog/2019-10-08-js13k-2019-highlights/
+Thanks to js13k organisers and thanks for voting xx142-b2.exe!
 
 MIT license. Copyright (c) 2019 Ben Clark, Salvatore Previti
 

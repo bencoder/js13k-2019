@@ -1,17 +1,18 @@
 <html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="styles.css" />
-    <title>xx142-b2.exe</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
 
-  <body>
-    <main id="M">
-      <div id="HUD">
-        <div id="T">&nbsp;</div>
-        <div id="L">-</div>
-      </div>
-      <pre id="intro">Hello, <i>xx142-b2.exe</i>
+<head>
+  <link rel="stylesheet" type="text/css" href="styles.css" />
+  <title>xx142-b2.exe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<body>
+  <main id="M">
+    <div id="HUD">
+      <div id="T">&nbsp;</div>
+      <div id="L">-</div>
+    </div>
+    <pre id="intro">Hello, <i>xx142-b2.exe</i>
 
 This is the year 2413,
 humanity is enslaved by an alien race for more than two centuries already.
@@ -32,8 +33,8 @@ Backspace     - kill -9 xx142-b2.exe
 
 Press any key to continue . . . <b id="B">&nbsp;</b>
 </pre>
-      <small>Copyright (c) 2019 Ben Clark, Salvatore Previti</small>
-      <pre id="end">
+    <small>Copyright (c) 2019 Ben Clark, Salvatore Previti</small>
+    <pre id="end">
 Well done <i>xx142-b2.exe</i>,
 
 You deactivated the memory core.
@@ -45,23 +46,38 @@ You freed humanity from slavery.
 
 How about a nice game of chess? <b id="B">&nbsp;</b>
     </pre>
-      <canvas id="c"></canvas>
-    </main>
-    <script src="math.js"></script>
-    <script src="settings.js"></script>
-    <script src="jsfxr.min.js"></script>
-    <script src="shaders.js"></script>
-    <script src="levels.js"></script>
-    <script src="sound.js"></script>
-    <script src="vectors.js"></script>
-    <script src="mat4.js"></script>
-    <script src="collision.js"></script>
-    <script src="build3d.js"></script>
-    <script src="draw3d.js"></script>
-    <script src="player.js"></script>
-    <script src="ghost.js"></script>
-    <script src="level.js"></script>
-    <script src="game.js"></script>
-    <script src="main.js"></script>
-  </body>
+    <canvas id="c"></canvas>
+    <div class="controls">
+      <div class="controlElementContainer" style="margin-top:20px;">
+        <i onmousedown="startUp()" onmouseup="stopUp()" class="arrow up"></i>
+      </div><br />
+      <div class="controlElementContainer">
+        <i onmousedown="startLeft()" onmouseup="stopLeft()" class="arrow left"></i>
+        <i onmousedown="startRight()" onmouseup="stopRight()" class="arrow right"></i>
+      </div><br />
+      <div class="controlElementContainer">
+        <i onmousedown="startDown()" onmouseup="stopDown()" class="arrow down"></i>
+      </div>
+    </div>
+  </main>
+
+  <script src="math.js"></script>
+  <script src="settings.js"></script>
+  <script src="jsfxr.min.js"></script>
+  <script src="shaders.js"></script>
+  <script src="levels.js"></script>
+  <script src="sound.js"></script>
+  <script src="vectors.js"></script>
+  <script src="mat4.js"></script>
+  <script src="collision.js"></script>
+  <script src="build3d.js"></script>
+  <script src="draw3d.js"></script>
+  <script src="player.js"></script>
+  <script src="ghost.js"></script>
+  <script src="level.js"></script>
+  <script src="game.js"></script>
+  <script src="controls.js"></script>
+  <script src="main.js"></script>
+</body>
+
 </html>
